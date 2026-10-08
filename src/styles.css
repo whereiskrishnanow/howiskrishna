@@ -1,0 +1,941 @@
+/* Registered so the text colours can fade when the page re-themes on hover. */
+@property --ink {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #000;
+}
+@property --ink-soft {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #2e2e2e;
+}
+
+:root {
+  --bg: #eeeeee;
+  --ink: #000;
+  --ink-soft: #2e2e2e;
+  --contrast: #000; /* the hovered card's fill; switches instantly, no fade */
+  --serif: 'Libre Caslon Condensed', 'Times New Roman', Times, serif;
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* One "design pixel", scaling with the screen. --scale sizes the whole site:
+     1 = the original mockup (1px on a 1440×880 viewport). */
+  --scale: 0.9;
+  --u: calc(var(--scale) * clamp(0.78px, min(100vw / 1440, 100vh / 880), 1.5px));
+  --gutter: calc(160 * var(--u)); /* home page side margin */
+  --card-w: calc(320 * var(--u));
+
+  color-scheme: light;
+  transition:
+    --ink 0.5s ease,
+    --ink-soft 0.5s ease;
+}
+
+/* While a card is hovered the page takes on its picture; text flips to
+   whichever of white or black reads best on it. */
+:root[data-ink='white'] {
+  --ink: #fff;
+  --ink-soft: rgb(255 255 255 / 0.86);
+  --contrast: #fff;
+}
+:root[data-ink='black'] {
+  --ink: #000;
+  --ink-soft: rgb(0 0 0 / 0.82);
+  --contrast: #000;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--sans);
+  /* Inter's Display cut (its large optical size) at every size, set a touch tighter */
+  font-optical-sizing: none;
+  font-variation-settings: 'opsz' 32;
+  letter-spacing: -0.03em;
+  background: var(--bg);
+}
+
+ul {
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------- Layout: one horizontal row on desktop ---------- */
+
+.track {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  overflow: clip; /* the glows bleed sideways; don't let them widen the page */
+  width: max-content;
+  height: 100vh;
+  height: 100svh;
+  /* Enough room on the right that the row can scroll until the last card sits
+     in the middle of the screen. */
+  padding: calc(48 * var(--u)) calc((100vw - var(--card-w)) / 2) 0 var(--gutter);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+}
+
+/* ---------- Intro ---------- */
+
+.intro {
+  flex: none;
+}
+
+.intro-title {
+  font-family: var(--serif);
+  font-size: calc(60 * var(--u));
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+
+.intro-summary {
+  max-width: calc(520 * var(--u));
+  margin-top: calc(25 * var(--u));
+  font-size: calc(19 * var(--u));
+  line-height: 1.24;
+  color: var(--ink-soft);
+}
+
+/* ---------- Projects ---------- */
+
+.projects {
+  position: relative;
+  top: calc(-8 * var(--u)); /* labels sit a touch above the headline's baseline */
+  display: flex;
+  gap: calc(120 * var(--u));
+  margin-left: calc(88 * var(--u));
+}
+
+/* On large screens the gap scales up with everything else and starts to feel
+   detached; pull the cards in closer to the intro. */
+@media (min-width: 1600px) {
+  .projects {
+    margin-left: calc(60 * var(--u));
+  }
+}
+
+.project {
+  --w: var(--card-w);
+  --h: calc(var(--w) * 0.625); /* 16:10 */
+  flex: none;
+  width: var(--w);
+}
+
+.project-link {
+  display: block;
+  outline: none;
+}
+
+.project-head {
+  display: flex;
+  align-items: center;
+  padding-bottom: calc(12.5 * var(--u));
+}
+
+.project-title-row {
+  display: flex;
+  align-items: center;
+  transition: transform 0.6s var(--ease-out);
+}
+
+.project-title {
+  font-family: var(--serif);
+  font-size: calc(32 * var(--u));
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+
+/* On hover the title lifts and a one-line description fades in beneath it,
+   in the space above the picture. Nothing else moves. */
+.project {
+  --lift: calc(-33 * var(--u));
+}
+
+.project-text {
+  position: relative;
+  min-width: 0;
+}
+
+.project-desc {
+  position: absolute;
+  top: calc(100% + 10 * var(--u));
+  left: 0;
+  width: var(--w);
+  overflow: hidden;
+  font-size: calc(19 * var(--u)); /* same as the intro summary */
+  line-height: 1.24;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateY(calc(-8 * var(--u)));
+  transition:
+    opacity 0.35s ease,
+    transform 0.6s var(--ease-out);
+  pointer-events: none;
+}
+
+/* The picture: crisp top edge, dissolving downward into a soft glow. */
+.media {
+  --bleed-x: calc(var(--h) * 0.6);
+  --bleed-b: calc(var(--h) * 0.9);
+  /* Even the top edge is slightly soft, so the picture never reads as a sharp photo. */
+  --edge-blur: calc(1.5 * var(--u));
+  --edge-room: calc(var(--edge-blur) * 3); /* space above the card for that softness */
+  position: relative;
+  display: block;
+  height: var(--h);
+}
+
+.media-glow {
+  position: absolute;
+  top: calc(-1 * var(--edge-room));
+  right: calc(-1 * var(--bleed-x));
+  bottom: calc(-1 * var(--bleed-b));
+  left: calc(-1 * var(--bleed-x));
+  isolation: isolate;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--edge-room) + var(--h) * 0.4),
+    transparent calc(var(--edge-room) + var(--h) * 1.32)
+  );
+  pointer-events: none;
+}
+
+.media-layer {
+  position: absolute;
+  inset: 0;
+  mix-blend-mode: plus-lighter;
+}
+
+/* Each copy: a fixed card-sized frame (the blur spills out of it), with the
+   image drifting inside. */
+.media-frame {
+  position: absolute;
+  top: var(--edge-room);
+  right: var(--bleed-x);
+  left: var(--bleed-x);
+  height: var(--h);
+  overflow: hidden;
+  filter: blur(calc(var(--edge-blur) + var(--h) * var(--blur)));
+}
+
+.media-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.12);
+}
+
+@media (hover: hover) {
+  .project-link:hover .project-title-row {
+    transform: translateY(var(--lift));
+  }
+  .project-link:hover .project-desc {
+    opacity: 1;
+    transform: translateY(var(--lift));
+    transition-delay: 0.06s, 0s;
+  }
+}
+
+.project-link:focus-visible .project-title-row {
+  transform: translateY(var(--lift));
+}
+.project-link:focus-visible .project-desc {
+  opacity: 1;
+  transform: translateY(var(--lift));
+}
+
+/* Touch screens can't hover, so show the description all the time there. */
+@media (hover: none) {
+  .project-desc {
+    position: static;
+    display: block;
+    margin-top: 6px;
+    opacity: 1;
+    transform: none;
+  }
+}
+.project-link:focus-visible .project-title {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.14em;
+}
+
+/* ---------- Cloth background ---------- */
+
+.cloth {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* ---------- Hover backdrop ---------- */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.backdrop-layer {
+  position: absolute;
+  inset: -15%; /* oversized so the blur doesn't fade out at the screen edges */
+  background-position: center;
+  background-size: cover;
+  filter: blur(32px) saturate(1.1);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.7s ease,
+    visibility 0s linear 0.7s;
+}
+
+.backdrop-layer[data-on] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.7s ease,
+    visibility 0s;
+}
+
+.backdrop-veil {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+.backdrop-veil[data-ink='white'] {
+  background: rgb(0 0 0 / 0.16);
+  opacity: 1;
+}
+.backdrop-veil[data-ink='black'] {
+  background: rgb(255 255 255 / 0.18);
+  opacity: 1;
+}
+
+/* The hovered card's blur turns solid white or black, keeping its shape. */
+.media-solid {
+  position: absolute;
+  inset: 0;
+  background: var(--contrast);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.project[data-active] .media-solid {
+  opacity: 1;
+}
+/* the clicked card shows its picture again, so that is what glides out */
+.project-link[data-morph] .media-solid {
+  opacity: 0;
+  transition: none;
+}
+
+/* ---------- Cursor ---------- */
+
+.dot-cursor-on,
+.dot-cursor-on * {
+  cursor: none !important;
+}
+
+.dot-cursor-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* A negative of whatever is underneath: white blended with "difference"
+   inverts the colours behind it, so the dot always shows in their contrast.
+   The goo filter fuses the trailing blobs into one slimy shape. */
+.dot-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  pointer-events: none;
+  opacity: 0;
+  filter: url(#dot-goo);
+  mix-blend-mode: difference;
+  will-change: transform;
+}
+
+.dot-cursor-blob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.dot-cursor[data-visible] {
+  opacity: 1;
+}
+
+/* ---------- Decoding text ---------- */
+
+/* While a character is still decoding, its real letter is kept (invisible) to
+   hold the width, and a flickering glyph is drawn over it. */
+.scramble-char {
+  position: relative;
+}
+
+.scramble-char:not(.is-done) {
+  color: transparent;
+}
+
+.scramble-char:not(.is-done)::after {
+  content: attr(data-glyph);
+  position: absolute;
+  top: 0;
+  left: 50%;
+  color: var(--ink-soft);
+  opacity: 0.55;
+  transform: translateX(-50%);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- Detail page ---------- */
+
+.cs {
+  --cs-gutter: calc(300 * var(--u));
+  position: relative;
+  z-index: 1;
+  --cs-max: calc(840 * var(--u) + 2 * var(--cs-gutter));
+  max-width: var(--cs-max);
+  margin: 0 auto;
+  padding: 30vh var(--cs-gutter) calc(160 * var(--u));
+  animation: fade 0.5s ease both;
+}
+
+/* A long, thin arrow back to the home page, just above the title; it rises
+   and pins with the header, lined up with everything else. */
+.cs-back {
+  display: inline-block;
+  margin-bottom: calc(18 * var(--u));
+  padding: 8px 8px 8px 0;
+  color: var(--ink-soft);
+  pointer-events: auto; /* the header itself lets clicks through */
+  transition: color 0.2s;
+}
+.cs-back svg {
+  display: block;
+  width: 36px;
+  height: auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.4s var(--ease-out);
+}
+.cs-back:hover,
+.cs-back:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+.cs-back:hover svg,
+.cs-back:focus-visible svg {
+  transform: translateX(-6px);
+}
+
+/* Title, tagline and the wide blurred band: rises with the page, then pins. */
+.cs-head {
+  position: sticky;
+  top: calc(16 * var(--u));
+  z-index: 2;
+  pointer-events: none;
+}
+
+.cs-titlebar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: calc(14 * var(--u));
+}
+
+.cs-title {
+  font-family: var(--serif);
+  font-size: calc(44 * var(--u));
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.05em;
+}
+
+.cs-tagline {
+  font-family: var(--serif);
+  font-size: calc(24 * var(--u));
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  color: var(--ink-soft);
+  text-align: right;
+}
+
+.cs-band {
+  --h: calc(130 * var(--u));
+  --i: 0;
+}
+
+/* The article; it slides up under the band and is hidden above its top edge. */
+.cs-body {
+  padding: calc(58 * var(--u)) 0 0;
+  font-size: calc(19 * var(--u)); /* same as the home page's intro text */
+  line-height: 1.42;
+  color: var(--ink-soft);
+}
+
+.cs-p {
+  margin-bottom: 1.4em;
+}
+
+.cs-closing {
+  margin-top: calc(56 * var(--u));
+}
+
+.cs-h2 {
+  margin: calc(46 * var(--u)) 0 calc(22 * var(--u));
+  font-family: var(--serif);
+  font-size: max(21.5px, calc(30 * var(--u)));
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.05em;
+  color: var(--ink);
+}
+
+.cs-list {
+  margin: 0 0 1.4em;
+  padding-left: 1.2em;
+  list-style: disc;
+}
+
+.cs-list li {
+  margin-bottom: 0.55em;
+  padding-left: 0.2em;
+}
+
+.cs-list strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.cs-figure {
+  display: grid;
+  gap: calc(16 * var(--u));
+  margin: calc(28 * var(--u)) 0 calc(44 * var(--u));
+}
+
+.cs-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(14 * var(--u));
+  background: rgb(0 0 0 / 0.04);
+}
+
+.cs-figure figcaption {
+  margin-top: calc(4 * var(--u));
+  font-size: 0.94em;
+}
+
+.cs-figure figcaption strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* CooKit's phone screens: a grid, each with its label above. */
+.cs-phones {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: calc(40 * var(--u)) calc(28 * var(--u));
+  align-items: start;
+  margin: calc(28 * var(--u)) 0 calc(44 * var(--u));
+}
+
+.cs-phones figcaption {
+  margin-bottom: calc(10 * var(--u));
+  font-size: 0.9em;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.cs-phones img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: calc(16 * var(--u));
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.06);
+}
+
+@media (max-width: 767.98px) {
+  .cs-phones {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 14px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cs-band .media-img {
+    animation-play-state: running;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .cs {
+    --cs-gutter: 18px;
+    padding-top: 26vh;
+  }
+  .cs-head {
+    top: 12px;
+  }
+  .cs-titlebar {
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cs-title {
+    font-size: 31px;
+  }
+  .cs-tagline {
+    font-size: 17px;
+    text-align: left;
+  }
+  .cs-band {
+    --h: 86px;
+  }
+  .cs-body {
+    padding: 47px 0 0;
+    font-size: 14.5px; /* same as the home page's intro text on phones */
+  }
+}
+
+/* ---------- Page transition ---------- */
+
+/* Opening a card: its band expands into the detail page's band and its title
+   moves into place, while the pages simply cross-fade and the article fades up.
+   Going back plays the same in reverse. */
+.project-link[data-morph] .media,
+.cs-band .media {
+  view-transition-name: hero-band;
+}
+.project-link[data-morph] .project-title,
+.cs-title {
+  view-transition-name: hero-title;
+}
+
+::view-transition-group(hero-band),
+::view-transition-group(hero-title) {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+::view-transition-group(hero-band) {
+  z-index: 3;
+}
+::view-transition-group(hero-title) {
+  z-index: 4;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.4s;
+  animation-timing-function: ease;
+}
+
+/* the article rises in, a beat after the band lands */
+@media (prefers-reduced-motion: no-preference) {
+  /* only the first few blocks, which are on screen; animating the large
+     screenshots further down costs frames for nothing */
+  .cs-body > :nth-child(-n + 6) {
+    animation: rise 0.9s var(--ease-out) both;
+  }
+  .cs-body > :nth-child(1) { animation-delay: 0.3s; }
+  .cs-body > :nth-child(2) { animation-delay: 0.37s; }
+  .cs-body > :nth-child(3) { animation-delay: 0.44s; }
+  .cs-body > :nth-child(4) { animation-delay: 0.51s; }
+  .cs-body > :nth-child(n + 5) { animation-delay: 0.58s; } /* 5th and 6th */
+}
+
+/* ---------- Contact ---------- */
+
+.contact {
+  position: fixed;
+  bottom: calc(86.5 * var(--u));
+  left: var(--gutter);
+  z-index: 1;
+}
+
+.contact ul {
+  display: flex;
+  align-items: baseline;
+  font-size: calc(19 * var(--u));
+  color: var(--ink-soft);
+}
+
+.contact li + li::before {
+  content: '-';
+  margin: 0 calc(16 * var(--u));
+}
+
+.contact a {
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  transition:
+    color 0.2s,
+    text-decoration-color 0.2s;
+}
+
+.contact a:hover,
+.contact a:focus-visible {
+  color: var(--ink);
+  text-decoration-color: currentColor;
+  outline: none;
+}
+
+/* ---------- Desktop: the document scrolls sideways ---------- */
+
+@media (min-width: 768px) {
+  html.is-home {
+    overflow-y: hidden;
+    overscroll-behavior-x: none; /* no back-swipe at the start of the row */
+  }
+}
+
+/* ---------- Phones: stack vertically ---------- */
+
+@media (max-width: 767.98px) {
+  .track {
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 65px 18px 0;
+  }
+
+  .row {
+    display: block;
+  }
+
+  .intro-title {
+    font-size: clamp(36px, 10.8vw, 50px);
+    line-height: 1.02;
+    white-space: normal;
+  }
+
+  /* the forced break before "0→" would strand a word on narrow screens */
+  .intro-summary br {
+    display: none;
+  }
+
+  .intro-summary {
+    max-width: 30em;
+    margin-top: 18px;
+    font-size: 14.5px;
+  }
+
+  .projects {
+    flex-direction: column;
+    gap: 65px;
+    margin: 65px 0 0;
+  }
+
+  .project {
+    --w: 100%;
+    --h: calc((100vw - 36px) * 0.625);
+  }
+
+  .project-title {
+    font-size: 31px;
+  }
+
+  .project-desc {
+    font-size: 14.5px; /* matches the intro summary on phones */
+  }
+
+  .contact {
+    position: static;
+    padding: 108px 18px 43px;
+  }
+
+  .contact ul {
+    flex-wrap: wrap;
+    font-size: 14.5px;
+  }
+
+  .contact li + li::before {
+    margin: 0 9px;
+  }
+}
+
+/* ---------- Entrance ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .intro > * {
+    animation: rise 1s var(--ease-out) both;
+  }
+  .intro-summary {
+    animation-delay: 0.08s;
+  }
+  .project {
+    animation: slide-in 1.3s var(--ease-out) both;
+    animation-delay: calc(0.18s + var(--i) * 0.09s);
+  }
+  .contact {
+    animation: fade 1s ease both 0.4s;
+  }
+}
+
+/* The picture drifts under the blur, continuously: it pans around a slow loop
+   at constant speed while the zoom and a slight turn breathe on their own
+   timings, so the motion never comes to a stop. Every copy in a card shares the
+   timing so the stack stays aligned; each card is offset so they don't move in
+   step. The scale leaves room so the image's edges never come into view. */
+@media (prefers-reduced-motion: no-preference) {
+  .media-img {
+    transform: none;
+    scale: 1.3;
+    animation:
+      pan 12s linear infinite,
+      breathe 5s ease-in-out infinite alternate,
+      turn 8s ease-in-out infinite alternate;
+    animation-delay: calc(var(--i) * -2.3s), calc(var(--i) * -1.1s), calc(var(--i) * -1.7s);
+    animation-play-state: paused;
+    will-change: transform;
+  }
+  .project[data-onscreen] .media-img {
+    animation-play-state: running;
+  }
+}
+
+@keyframes pan {
+  0.0% {
+    translate: 9.0% 0.0%;
+  }
+  8.33% {
+    translate: 7.8% 2.5%;
+  }
+  16.67% {
+    translate: 4.5% 4.3%;
+  }
+  25.0% {
+    translate: 0.0% 5.0%;
+  }
+  33.33% {
+    translate: -4.5% 4.3%;
+  }
+  41.67% {
+    translate: -7.8% 2.5%;
+  }
+  50.0% {
+    translate: -9.0% 0.0%;
+  }
+  58.33% {
+    translate: -7.8% -2.5%;
+  }
+  66.67% {
+    translate: -4.5% -4.3%;
+  }
+  75.0% {
+    translate: -0.0% -5.0%;
+  }
+  83.33% {
+    translate: 4.5% -4.3%;
+  }
+  91.67% {
+    translate: 7.8% -2.5%;
+  }
+  100.0% {
+    translate: 9.0% -0.0%;
+  }
+}
+
+@keyframes breathe {
+  from {
+    scale: 1.3;
+  }
+  to {
+    scale: 1.38;
+  }
+}
+
+@keyframes turn {
+  from {
+    rotate: -3deg;
+  }
+  to {
+    rotate: 3deg;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-title-row,
+  .project-desc,
+  .backdrop-layer,
+  .backdrop-veil,
+  .media-solid {
+    transition: none;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(56px);
+  }
+}
+
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
