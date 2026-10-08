@@ -24,7 +24,7 @@
   --scale: 0.9;
   --u: calc(var(--scale) * clamp(0.78px, min(100vw / 1440, 100vh / 880), 1.5px));
   --gutter: calc(160 * var(--u)); /* home page side margin */
-  --card-w: calc(320 * var(--u));
+  --card-w: calc(380 * var(--u));
 
   color-scheme: light;
   transition:
