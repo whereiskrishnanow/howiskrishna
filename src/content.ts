@@ -14,7 +14,7 @@ export type Project = {
   /** The card's detail page. Its content lives in caseStudies.ts. */
   href: string
   /**
-   * Image under /public, cropped to 16:10. Its top edge is what shows sharpest,
+   * Image under public/ (path relative to the site), cropped to 16:10. Its top edge is what shows sharpest,
    * so frame the interesting part there.
    */
   image: string
@@ -28,12 +28,12 @@ export type Project = {
 }
 
 export const projects: Project[] = [
-  { id: 'superagi', title: 'SuperAGI', description: 'AI Super App for Work', href: '#/work/superagi', image: '/work/superagi.jpg', tint: '#2a1b4d' },
-  { id: 'contlo', title: 'Contlo', description: 'B2B Marketing Automation', href: '#/work/contlo', image: '/work/contlo.jpg', tint: '#e2820f' },
-  { id: 'voice-agents', title: 'Voice Agents', description: 'AI Voice Agent Management', href: '#/work/voice-agents', image: '/work/voice-agents.jpg', tint: '#dfe3e8' },
-  { id: 'coder-pro', title: 'Coder Pro', description: 'AI Coding Assistant for Enterprises', href: '#/work/coder-pro', image: '/work/coder-pro.jpg', tint: '#127f9a', ink: 'white' },
-  { id: 'i-live-assist', title: 'I Live Assist', description: 'Anonymous AI Assistant', href: '#/work/i-live-assist', image: '/work/i-live-assist.jpg', tint: '#7d7464' },
-  { id: 'cookit', title: 'CooKit', description: 'Meal Kit Delivery App', href: '#/work/cookit', image: '/work/cookit.jpg', tint: '#6f9a2c' },
+  { id: 'superagi', title: 'SuperAGI', description: 'AI Super App for Work', href: '#/work/superagi', image: 'work/superagi.jpg', tint: '#2a1b4d' },
+  { id: 'contlo', title: 'Contlo', description: 'B2B Marketing Automation', href: '#/work/contlo', image: 'work/contlo.jpg', tint: '#e2820f' },
+  { id: 'voice-agents', title: 'Voice Agents', description: 'AI Voice Agent Management', href: '#/work/voice-agents', image: 'work/voice-agents.jpg', tint: '#dfe3e8' },
+  { id: 'coder-pro', title: 'Coder Pro', description: 'AI Coding Assistant for Enterprises', href: '#/work/coder-pro', image: 'work/coder-pro.jpg', tint: '#127f9a', ink: 'white' },
+  { id: 'i-live-assist', title: 'I Live Assist', description: 'Anonymous AI Assistant', href: '#/work/i-live-assist', image: 'work/i-live-assist.jpg', tint: '#7d7464' },
+  { id: 'cookit', title: 'CooKit', description: 'Meal Kit Delivery App', href: '#/work/cookit', image: 'work/cookit.jpg', tint: '#6f9a2c' },
 ]
 
 export const contacts = [

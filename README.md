@@ -8,6 +8,8 @@ npm run dev      # http://localhost:5175
 npm run build    # outputs dist/
 ```
 
+`npm run deploy` builds the site and publishes it to the `gh-pages` branch, which GitHub Pages serves. Asset paths are relative (`base: './'` in `vite.config.ts`), so the same build works at the custom domain and under `whereiskrishnanow.github.io/howiskrishna/`.
+
 ## Editing content
 
 All copy, projects and links are in `src/content.ts`.

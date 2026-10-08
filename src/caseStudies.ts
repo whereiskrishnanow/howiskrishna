@@ -20,7 +20,8 @@ export type CaseStudy = {
   blocks: Block[]
 }
 
-const img = (id: string, file: string) => `/work/${id}/${file}`
+// relative, so the site works at a domain root or under a sub-path (GitHub Pages)
+const img = (id: string, file: string) => `work/${id}/${file}`
 
 export const caseStudies: Record<string, CaseStudy> = {
   superagi: {
