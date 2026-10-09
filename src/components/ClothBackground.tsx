@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { isLite } from '../lib/device'
 
 // The page background as a sheet of very smooth cloth. A height field is
 // simulated on the CPU (a tensioned membrane: neighbours pull each other level,
@@ -77,7 +78,9 @@ export function ClothBackground() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // On phones (and with reduced motion) the cloth is drawn once and holds
+    // still: the simulation would cost a phone every frame it has.
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches || isLite()
 
     let gw = 160
     let gh = 100
@@ -199,7 +202,7 @@ export function ClothBackground() {
     upload()
     canvas.dataset.ready = ''
 
-    if (reduced) {
+    if (still) {
       const onResize = () => {
         resize()
         drape(0)

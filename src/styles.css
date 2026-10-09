@@ -1005,3 +1005,32 @@ a {
     opacity: 0;
   }
 }
+
+/* ---------- Mobile: lighter ---------- */
+
+/* Phones and touch tablets (same query as LITE_QUERY in lib/device.ts) keep
+   the look but drop what animates every frame, so scrolling stays smooth:
+   no image drift under the blurs, no glow transitions, and the blurred layers
+   are promoted once so scrolling just moves them. Desktop is untouched. */
+@media (max-width: 767.98px), (hover: none) and (pointer: coarse) {
+  .media-img,
+  .cs-band .media-img {
+    animation: none !important;
+    will-change: auto;
+  }
+  .media-glow {
+    transform: translateZ(0);
+  }
+  .backdrop {
+    display: none; /* hover-only; there is no hover on touch */
+  }
+  .project {
+    animation-duration: 0.7s !important;
+  }
+  .cs-body > * {
+    animation: none !important;
+  }
+  .cs-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}

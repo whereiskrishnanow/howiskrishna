@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
+import { isLite } from '../lib/device'
 
 // Hash-based routes (#/work/<id>), so the site works on any static host with no
 // server rewrites.
@@ -35,7 +36,8 @@ export function navigate(href: string, id?: string) {
     }
   }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (!document.startViewTransition || reduced) {
+  // phones switch pages instantly: snapshotting both pages costs them a stutter
+  if (!document.startViewTransition || reduced || isLite()) {
     clearMorph()
     return go()
   }
