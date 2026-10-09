@@ -23,6 +23,9 @@ export function useHorizontalScroll() {
     const reduced = window.matchMedia(REDUCED_MOTION)
     let lenis: Lenis | null = null
 
+    // The real end of the row, read fresh from the page.
+    const realLimit = () => document.documentElement.scrollWidth - window.innerWidth
+
     const start = () => {
       lenis?.destroy()
       lenis = desktop.matches
@@ -33,6 +36,14 @@ export function useHorizontalScroll() {
             autoRaf: true,
           })
         : null
+    }
+
+    // Belt and braces: whatever changed the page without us noticing (a browser
+    // extension, a late font, a resize mid-animation), never let the scroller
+    // work from a stale end point. Re-check it on every scroll input, before
+    // Lenis acts on it, so the last card always reaches the centre.
+    const checkLimit = () => {
+      if (lenis && Math.abs(lenis.limit - realLimit()) > 1) lenis.resize()
     }
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -89,6 +100,8 @@ export function useHorizontalScroll() {
     }
     desktop.addEventListener('change', start)
     reduced.addEventListener('change', start)
+    window.addEventListener('wheel', checkLimit, { passive: true, capture: true })
+    window.addEventListener('keydown', checkLimit, { capture: true })
     window.addEventListener('keydown', onKeyDown)
 
     return () => {
@@ -97,6 +110,8 @@ export function useHorizontalScroll() {
       document.documentElement.classList.remove('is-home')
       desktop.removeEventListener('change', start)
       reduced.removeEventListener('change', start)
+      window.removeEventListener('wheel', checkLimit, { capture: true })
+      window.removeEventListener('keydown', checkLimit, { capture: true })
       window.removeEventListener('keydown', onKeyDown)
       window.removeEventListener('load', remeasure)
       trackObserver.disconnect()
