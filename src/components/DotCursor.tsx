@@ -203,7 +203,9 @@ export function DotCursor() {
 
   return (
     <div ref={box} className="glass-cursor" aria-hidden="true" style={{ width: BOX, height: BOX }}>
-      <div ref={glass} className="glass-cursor-glass" />
+      <div ref={glass} className="glass-cursor-glass">
+        <div className="glass-cursor-color" />
+      </div>
       <svg className="glass-cursor-rim" viewBox={`0 0 ${BOX} ${BOX}`} width={BOX} height={BOX}>
         <defs>
           {/* light from the upper left: bright there, faint opposite */}

@@ -400,6 +400,53 @@ a {
   opacity: 1;
 }
 
+/* Colour swirling inside the glass: two soft rainbow wheels turning opposite
+   ways around slightly different centres (the drop sits at the box centre),
+   blended and kept partly see-through so the glass still shows the page. */
+@property --swirl-a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --swirl-b {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.glass-cursor-color {
+  position: absolute;
+  inset: 0;
+  opacity: 0.5;
+  background:
+    conic-gradient(
+      from var(--swirl-a) at 48% 47%,
+      #a23cff, #3d5bff, #12c9e8, #2fe07a, #ffe23a, #ff9a1f, #ff3d8b, #a23cff
+    ),
+    conic-gradient(from var(--swirl-b) at 53% 54%, #ff3d8b, #ffe23a, #12c9e8, #a23cff, #ff3d8b);
+  background-blend-mode: screen;
+  filter: blur(3px) saturate(1.3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .glass-cursor-color {
+    animation:
+      swirl-a 5s linear infinite,
+      swirl-b 7.5s linear infinite reverse;
+  }
+}
+
+@keyframes swirl-a {
+  to {
+    --swirl-a: 360deg;
+  }
+}
+@keyframes swirl-b {
+  to {
+    --swirl-b: 360deg;
+  }
+}
+
 .glass-cursor-rim {
   position: absolute;
   inset: 0;
