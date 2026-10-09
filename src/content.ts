@@ -36,9 +36,15 @@ export const projects: Project[] = [
   { id: 'cookit', title: 'CooKit', description: 'Meal Kit Delivery App', href: '#/work/cookit', image: 'work/cookit.jpg', tint: '#6f9a2c' },
 ]
 
-export const contacts = [
+export const contacts: { label: string; href: string; external: boolean; copy?: string }[] = [
   { label: 'Resume', href: 'https://drive.google.com/file/d/1s-Xyzh_BEhCfGwhQzpS-BDruNb_Hr8st/view?usp=sharing', external: true },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/krishna-vamsi-anumalasetty/', external: true },
-  { label: 'Mail', href: 'mailto:whereiskrishnanow@gmail.com?subject=Hey%20there%2C%20Let%27s%20connect', external: false },
+  // also copies the address, for visitors with no mail app set up
+  {
+    label: 'Mail',
+    href: 'mailto:whereiskrishnanow@gmail.com?subject=Hey%20there%2C%20Let%27s%20connect',
+    external: false,
+    copy: 'whereiskrishnanow@gmail.com',
+  },
   { label: 'Phone', href: 'https://wa.me/919663800886?text=Hey%20there', external: true }, // opens a WhatsApp chat
 ]

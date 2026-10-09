@@ -759,6 +759,32 @@ a {
   margin: 0 calc(16 * var(--u));
 }
 
+/* "Email copied" note, just above the contact links */
+.contact-toast {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: calc(14 * var(--u));
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.4s var(--ease-out);
+  pointer-events: none;
+}
+.contact-toast[data-show] {
+  opacity: 1;
+  transform: none;
+}
+:root[data-ink='white'] .contact-toast {
+  color: #111;
+}
+
 .contact a {
   text-decoration-line: underline;
   text-decoration-color: transparent;
@@ -836,7 +862,7 @@ a {
   }
 
   .contact {
-    position: static;
+    position: relative; /* anchors the "Email copied" note */
     padding: 108px 18px 43px;
   }
 
