@@ -392,6 +392,7 @@ a {
   position: absolute;
   inset: 0;
   background: rgb(255 255 255 / 0.08);
+  overflow: hidden;
   -webkit-backdrop-filter: blur(0.8px) saturate(1.8) brightness(1.12) contrast(1.05);
   backdrop-filter: blur(0.8px) saturate(1.8) brightness(1.12) contrast(1.05);
 }
@@ -400,50 +401,41 @@ a {
   opacity: 1;
 }
 
-/* Colour swirling inside the glass: two soft rainbow wheels turning opposite
-   ways around slightly different centres (the drop sits at the box centre),
-   blended and kept partly see-through so the glass still shows the page. */
-@property --swirl-a {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-@property --swirl-b {
-  syntax: '<angle>';
-  inherits: false;
-  initial-value: 0deg;
-}
-
+/* Colour swirling inside the glass: two soft rainbow wheels, pre-drawn and
+   blurred once, rotated in opposite directions on the GPU (transform only, so
+   nothing repaints per frame). Partly see-through so the glass still shows. */
 .glass-cursor-color {
   position: absolute;
   inset: 0;
-  opacity: 0.5;
-  background:
-    conic-gradient(
-      from var(--swirl-a) at 48% 47%,
-      #a23cff, #3d5bff, #12c9e8, #2fe07a, #ffe23a, #ff9a1f, #ff3d8b, #a23cff
-    ),
-    conic-gradient(from var(--swirl-b) at 53% 54%, #ff3d8b, #ffe23a, #12c9e8, #a23cff, #ff3d8b);
-  background-blend-mode: screen;
-  filter: blur(3px) saturate(1.3);
+  will-change: transform;
+}
+
+.glass-cursor-color-a {
+  opacity: 0.85;
+  background: conic-gradient(#b026ff, #3a4dff, #00d4ff, #00e676, #ffe600, #ff8a00, #ff1f6b, #b026ff);
+  filter: blur(4px) saturate(1.4);
+}
+
+.glass-cursor-color-b {
+  inset: 3%;
+  opacity: 0.45;
+  background: conic-gradient(from 120deg at 53% 54%, #ff1f6b, #ffe600, #00d4ff, #b026ff, #ff1f6b);
+  filter: blur(5px) saturate(1.4);
+  mix-blend-mode: screen;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .glass-cursor-color {
-    animation:
-      swirl-a 5s linear infinite,
-      swirl-b 7.5s linear infinite reverse;
+  .glass-cursor-color-a {
+    animation: spin 5s linear infinite;
+  }
+  .glass-cursor-color-b {
+    animation: spin 7.5s linear infinite reverse;
   }
 }
 
-@keyframes swirl-a {
+@keyframes spin {
   to {
-    --swirl-a: 360deg;
-  }
-}
-@keyframes swirl-b {
-  to {
-    --swirl-b: 360deg;
+    transform: rotate(360deg);
   }
 }
 
@@ -453,12 +445,17 @@ a {
   overflow: visible;
 }
 
+/* a fine dark line just outside the rim, so the drop shows on the pale page */
+.glass-cursor-line {
+  fill: none;
+  stroke: rgb(0 0 0 / 0.28);
+  stroke-width: 2.6px;
+}
+
 .glass-cursor-edge {
   fill: url(#glass-sheen);
   stroke: url(#glass-rim);
   stroke-width: 1.6px;
-  /* a fine dark line just outside, so the clear glass shows on the pale page */
-  filter: drop-shadow(0 0 0.6px rgb(0 0 0 / 0.45)) drop-shadow(0 1.5px 3px rgb(0 0 0 / 0.12));
 }
 
 /* ---------- Decoding text ---------- */

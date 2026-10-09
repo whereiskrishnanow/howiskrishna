@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 // the tail catches up, wobbles and settles back into a round drop.
 // Mouse/trackpad only; touch screens keep their normal behaviour.
 
-const BOX = 260 // px, drawing area around the dot (the tail stays inside it)
+const BOX = 170 // px, drawing area around the dot (the tail stays inside it)
 const HEAD = 10 // px radius of the drop at rest (20px across)
 const TAIL = [9.2, 8.4, 7.6, 6.8, 6, 5.3, 4.6, 4] // radii of the trailing blobs, nearest first
 const FOLLOW = 0.03 // s; how quickly the dot catches up with the pointer (smooths jitter)
@@ -80,6 +80,7 @@ export function DotCursor() {
   const [enabled, setEnabled] = useState(false)
   const box = useRef<HTMLDivElement>(null)
   const rim = useRef<SVGPathElement>(null)
+  const line = useRef<SVGPathElement>(null)
   const glass = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -116,6 +117,7 @@ export function DotCursor() {
       ])
       if (glass.current) glass.current.style.clipPath = `path('${d}')`
       rim.current?.setAttribute('d', d)
+      line.current?.setAttribute('d', d)
     }
 
     const step = (dt: number) => {
@@ -123,6 +125,7 @@ export function DotCursor() {
       head.x += (target.x - head.x) * ease
       head.y += (target.y - head.y) * ease
       let lead = head
+      let prev: { x: number; y: number } | null = null
       for (const b of blobs) {
         // a damped spring toward the blob ahead of it
         b.vx += ((lead.x - b.x) * STIFFNESS - b.vx * damping) * dt
@@ -130,12 +133,30 @@ export function DotCursor() {
         b.x += b.vx * dt
         b.y += b.vy * dt
         // stay attached to the blob ahead: stretch, never snap off into droplets
-        const lx = b.x - lead.x
-        const ly = b.y - lead.y
-        const ld = Math.hypot(lx, ly)
+        let lx = b.x - lead.x
+        let ly = b.y - lead.y
+        let ld = Math.hypot(lx, ly)
         if (ld > LINK) {
           b.x = lead.x + (lx / ld) * LINK
           b.y = lead.y + (ly / ld) * LINK
+          lx = b.x - lead.x
+          ly = b.y - lead.y
+          ld = LINK
+        }
+        // no sharp kinks: bend at most ~50° from the segment ahead, so the
+        // outline stays a smooth curve instead of folding into a hook
+        if (prev && ld > 0.5) {
+          const px = lead.x - prev.x
+          const py = lead.y - prev.y
+          const pd = Math.hypot(px, py)
+          if (pd > 0.5) {
+            const cos = (lx * px + ly * py) / (ld * pd)
+            if (cos < 0.64) {
+              const blend = 0.35
+              b.x += ((lead.x + (px / pd) * ld) - b.x) * blend
+              b.y += ((lead.y + (py / pd) * ld) - b.y) * blend
+            }
+          }
         }
         // never let the tail outgrow the drawing area
         const dx = b.x - head.x
@@ -145,6 +166,7 @@ export function DotCursor() {
           b.x = head.x + (dx / d) * MAX_STRETCH
           b.y = head.y + (dy / d) * MAX_STRETCH
         }
+        prev = lead
         lead = b
       }
     }
@@ -204,7 +226,8 @@ export function DotCursor() {
   return (
     <div ref={box} className="glass-cursor" aria-hidden="true" style={{ width: BOX, height: BOX }}>
       <div ref={glass} className="glass-cursor-glass">
-        <div className="glass-cursor-color" />
+        <div className="glass-cursor-color glass-cursor-color-a" />
+        <div className="glass-cursor-color glass-cursor-color-b" />
       </div>
       <svg className="glass-cursor-rim" viewBox={`0 0 ${BOX} ${BOX}`} width={BOX} height={BOX}>
         <defs>
@@ -220,6 +243,7 @@ export function DotCursor() {
             <stop offset="1" stopColor="#fff" stopOpacity="0" />
           </radialGradient>
         </defs>
+        <path ref={line} className="glass-cursor-line" />
         <path ref={rim} className="glass-cursor-edge" />
       </svg>
     </div>
