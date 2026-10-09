@@ -499,13 +499,6 @@ a {
   color: var(--head-ink);
 }
 
-/* white text over the lighter parts of the glow: a soft shadow keeps it legible */
-.cs-head[data-ink='white'] .cs-head-inner {
-  text-shadow: 0 1px 14px rgb(0 0 0 / 0.28);
-}
-.cs-head[data-ink='white'] .cs-back svg {
-  filter: drop-shadow(0 1px 6px rgb(0 0 0 / 0.3));
-}
 
 .cs-head-inner {
   position: absolute;
@@ -518,7 +511,7 @@ a {
   max-width: var(--cs-max);
   height: var(--band-h);
   margin: 0 auto;
-  padding: 0 var(--cs-gutter) calc(26 * var(--u));
+  padding: 0 var(--cs-gutter) calc(52 * var(--u));
 }
 
 .cs-titlebar {
@@ -676,7 +669,7 @@ a {
     text-align: left;
   }
   .cs-head-inner {
-    padding-bottom: 18px;
+    padding-bottom: 34px;
   }
   .cs-body {
     padding: 0;
