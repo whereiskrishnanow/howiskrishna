@@ -20,9 +20,14 @@ export function ProjectCard({ project, index, active, onActivate, onDeactivate }
   useEffect(() => {
     const el = ref.current
     if (!el) return
-    const io = new IntersectionObserver(([entry]) => el.toggleAttribute('data-onscreen', entry.isIntersecting), {
-      rootMargin: '0px 200px',
-    })
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        el.toggleAttribute('data-onscreen', entry.isIntersecting)
+        // first time in view: plays the mobile "lightning bar" reveal (CSS only acts on phones)
+        if (entry.isIntersecting) el.setAttribute('data-seen', '')
+      },
+      { rootMargin: '0px 200px' },
+    )
     io.observe(el)
     return () => io.disconnect()
   }, [])

@@ -1024,13 +1024,106 @@ a {
   .backdrop {
     display: none; /* hover-only; there is no hover on touch */
   }
+  /* Lighter blur: 2 layers per picture instead of 8 (a crisp top cross-fading
+     into the deepest blur), so scrolling moves far fewer blurred layers. */
+  .media-layer:not(:first-child):not(:last-child) {
+    display: none;
+  }
+  .media-layer:first-child {
+    mask-image: linear-gradient(
+      to bottom,
+      #000 var(--edge-room),
+      transparent calc(var(--edge-room) + var(--h) * 0.55)
+    ) !important;
+  }
+  .media-layer:last-child {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent var(--edge-room),
+      #000 calc(var(--edge-room) + var(--h) * 0.55)
+    ) !important;
+  }
+
+  /* "Lightning bar" reveal: each card sits behind a panel the colour of the
+     page; when it first scrolls into view a bright bar sweeps across, carrying
+     the panel away and unveiling the card. Transform-only, so it's smooth. */
   .project {
-    animation-duration: 0.7s !important;
+    position: relative;
+    animation: none !important;
+  }
+  .project::after,
+  .project::before {
+    content: '';
+    position: absolute;
+    z-index: 2;
+    top: -12px;
+    bottom: -45%;
+    pointer-events: none;
+  }
+  .project::after {
+    left: -24px;
+    right: -24px;
+    background: var(--bg);
+  }
+  /* the bar itself, riding the panel's leading edge */
+  .project::before {
+    z-index: 3;
+    left: -26px;
+    width: 3px;
+    background: #fff;
+    box-shadow:
+      0 0 8px 2px rgb(255 255 255 / 0.95),
+      0 0 26px 8px rgb(150 200 255 / 0.65),
+      0 0 60px 18px rgb(190 140 255 / 0.35);
+    opacity: 0;
+  }
+  .project[data-seen]::after {
+    animation: unveil 0.75s cubic-bezier(0.7, 0, 0.2, 1) both;
+  }
+  .project[data-seen]::before {
+    animation: bolt 0.75s cubic-bezier(0.7, 0, 0.2, 1) both;
+  }
+  /* the first two cards are on screen together at load: stagger them */
+  .project:nth-child(2)[data-seen]::after,
+  .project:nth-child(2)[data-seen]::before {
+    animation-delay: 0.12s;
   }
   .cs-body > * {
     animation: none !important;
   }
   .cs-scroll {
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+@keyframes unveil {
+  to {
+    transform: translateX(calc(100% + 30px));
+  }
+}
+
+@keyframes bolt {
+  0% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+  12% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(calc(100vw + 30px));
+  }
+}
+
+/* mobile with reduced motion: no reveal, cards simply show */
+@media (max-width: 767.98px) and (prefers-reduced-motion: reduce),
+  (hover: none) and (pointer: coarse) and (prefers-reduced-motion: reduce) {
+  .project::after,
+  .project::before {
+    display: none;
   }
 }
