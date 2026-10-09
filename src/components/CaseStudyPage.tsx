@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { inkForHex, measureInk, type Ink } from '../lib/tone'
 import { navigate } from '../hooks/useRoute'
-import { caseStudies, type Block } from '../caseStudies'
+import { caseStudies, warmCaseStudy, type Block } from '../caseStudies'
 import type { Project } from '../content'
 import { BlurMedia } from './BlurMedia'
 import { Scramble } from './Scramble'
@@ -80,7 +80,7 @@ export function CaseStudyPage({ project }: { project: Project }) {
   const study = caseStudies[project.id]
   const blocks = study?.blocks ?? COMING_SOON
   const band = useRef<HTMLDivElement>(null)
-  const body = useRef<HTMLDivElement>(null)
+  const scrollerTop = useRef<HTMLDivElement>(null)
 
   // The title sits on the band, so it takes white or black, whichever reads
   // better on this project's picture (same choice as the home page hover).
@@ -99,6 +99,7 @@ export function CaseStudyPage({ project }: { project: Project }) {
   // before paint, so the page transition captures the top of the page
   useLayoutEffect(() => {
     window.scrollTo(0, 0)
+    if (scrollerTop.current) scrollerTop.current.scrollTop = 0
   }, [project.id])
 
   useEffect(() => {
@@ -109,35 +110,16 @@ export function CaseStudyPage({ project }: { project: Project }) {
     }
   }, [project.id, project.title])
 
-  // Fade the article out as it scrolls up into the band: fully hidden by the
-  // band's lower edge, so nothing shows behind the title, and fading in over
-  // the soft glow beneath it.
+  // The article scrolls in its own full-screen panel (see .cs-scroll), so the
+  // fade into the band is fixed in place and never lags behind the scroll.
+  // Focus it so the keyboard scrolls it straight away.
   useEffect(() => {
-    let raf = 0
-    const update = () => {
-      raf = 0
-      if (!band.current || !body.current) return
-      const b = band.current.getBoundingClientRect()
-      const gone = b.bottom - body.current.getBoundingClientRect().top // hidden above this
-      const clear = gone + b.height * 0.85 // fully visible below this
-      body.current.style.maskImage =
-        clear > 0 ? `linear-gradient(to bottom, transparent ${gone}px, #000 ${clear}px)` : ''
-    }
-    const schedule = () => {
-      if (!raf) raf = requestAnimationFrame(update)
-    }
-    update()
-    window.addEventListener('scroll', schedule, { passive: true })
-    window.addEventListener('resize', schedule)
-    return () => {
-      cancelAnimationFrame(raf)
-      window.removeEventListener('scroll', schedule)
-      window.removeEventListener('resize', schedule)
-    }
-  }, [])
+    scrollerTop.current?.focus({ preventScroll: true })
+    warmCaseStudy(project.id) // decode the screenshots before they scroll into view
+  }, [project.id])
 
   return (
-    <article className="cs">
+    <div className="cs-page">
       <header className="cs-head" data-ink={ink} style={{ '--head-ink': ink === 'white' ? '#fff' : '#000' } as CSSProperties}>
         <div className="cs-band" ref={band}>
           <BlurMedia project={project} />
@@ -166,12 +148,15 @@ export function CaseStudyPage({ project }: { project: Project }) {
         </div>
       </header>
 
-      <div className="cs-body" ref={body}>
-        {blocks.map((block, i) => (
-          <Content key={i} block={block} />
-        ))}
-
+      <div className="cs-scroll" ref={scrollerTop} tabIndex={-1}>
+        <article className="cs">
+          <div className="cs-body">
+            {blocks.map((block, i) => (
+              <Content key={i} block={block} />
+            ))}
+          </div>
+        </article>
       </div>
-    </article>
+    </div>
   )
 }

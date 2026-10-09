@@ -441,12 +441,28 @@ a {
 
 /* ---------- Detail page ---------- */
 
-.cs {
+.cs-page {
   --cs-gutter: calc(300 * var(--u));
-  position: relative;
-  z-index: 1;
   --cs-max: calc(840 * var(--u) + 2 * var(--cs-gutter));
   --band-h: calc(210 * var(--u));
+  position: relative;
+  z-index: 1;
+}
+
+/* The article scrolls in its own full-screen panel. Its fade into the band is
+   a fixed mask on the panel, so it never moves, lags or flickers. */
+.cs-scroll {
+  position: fixed;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  outline: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent var(--band-h), #000 calc(var(--band-h) * 1.8));
+  mask-image: linear-gradient(to bottom, transparent var(--band-h), #000 calc(var(--band-h) * 1.8));
+}
+
+.cs {
   max-width: var(--cs-max);
   margin: 0 auto;
   /* the article starts below the band and its glow */
@@ -549,7 +565,6 @@ a {
   width: 100%;
 }
 
-/* The article; it slides up under the band and is hidden above its top edge. */
 .cs-body {
   padding: calc(58 * var(--u)) 0 0;
   font-size: calc(19 * var(--u)); /* same as the home page's intro text */
@@ -653,7 +668,7 @@ a {
 }
 
 @media (max-width: 767.98px) {
-  .cs {
+  .cs-page {
     --cs-gutter: 18px;
     --band-h: 170px;
   }
