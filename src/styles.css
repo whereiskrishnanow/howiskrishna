@@ -818,6 +818,10 @@ a {
     display: block;
     width: auto;
     height: auto;
+    /* clip sideways only, so the last card's glow fades out below instead of
+       being cut off in a straight line */
+    overflow: visible;
+    overflow-x: clip;
     padding: 65px 18px 0;
   }
 
@@ -863,6 +867,7 @@ a {
 
   .contact {
     position: relative; /* anchors the "Email copied" note */
+    left: 0; /* the desktop gutter offset doesn't apply here */
     padding: 108px 18px 43px;
   }
 
