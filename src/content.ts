@@ -3,7 +3,7 @@
 export const intro = {
   title: 'Krishna & his experiences',
   // \n marks a line break
-  summary: 'A Founding Product Designer who built & scaled design from\n0→ Series A at SuperAGI (Formerly Contlo)',
+  summary: 'A Founding Product Designer who built & scaled design from\n0→ Series A at SuperAGI & Contlo',
 }
 
 export type Project = {
