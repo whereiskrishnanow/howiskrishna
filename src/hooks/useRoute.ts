@@ -12,8 +12,11 @@ const parse = (): Route => {
 
 const listeners = new Set<(r: Route) => void>()
 
-/** The card that morphs into (or out of) the detail page's band. */
-export let morphId: string | null = null
+// The card that morphs into (or out of) the detail page's band is marked with
+// data-morph only while its transition runs; a leftover mark would disable that
+// card's hover fill and give two elements the same transition name.
+const clearMorph = () =>
+  document.querySelectorAll('[data-morph]').forEach((el) => el.removeAttribute('data-morph'))
 
 /**
  * Go to a route. Where the browser supports it, the clicked card's band and
@@ -26,13 +29,22 @@ export function navigate(href: string, id?: string) {
     history.pushState(null, '', href)
     const route = parse()
     flushSync(() => listeners.forEach((l) => l(route)))
+    // going back: the card the band shrinks into is the one for this project
+    if (id && route.name === 'home') {
+      document.querySelector(`.project-link[href="#/work/${id}"]`)?.setAttribute('data-morph', '')
+    }
   }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (!document.startViewTransition || reduced) return go()
-  if (id) morphId = id
+  if (!document.startViewTransition || reduced) {
+    clearMorph()
+    return go()
+  }
   document.documentElement.dataset.transition = parse().name === 'home' ? 'open' : 'close'
   const t = document.startViewTransition(go)
-  t.finished.finally(() => delete document.documentElement.dataset.transition)
+  t.finished.finally(() => {
+    delete document.documentElement.dataset.transition
+    clearMorph()
+  })
 }
 
 export function useRoute() {

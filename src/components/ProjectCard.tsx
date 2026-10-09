@@ -2,7 +2,7 @@ import { useEffect, useRef, type CSSProperties } from 'react'
 import type { Project } from '../content'
 import { BlurMedia } from './BlurMedia'
 import { Scramble } from './Scramble'
-import { morphId, navigate } from '../hooks/useRoute'
+import { navigate } from '../hooks/useRoute'
 import { warmCaseStudy } from '../caseStudies'
 
 type Props = {
@@ -39,7 +39,6 @@ export function ProjectCard({ project, index, active, onActivate, onDeactivate }
           onDeactivate(project.id)
           navigate(project.href, project.id)
         }}
-        data-morph={project.id === morphId || undefined}
         // Mouse and pen only: on touch the tap just follows the link.
         onPointerEnter={(e) => {
           warmCaseStudy(project.id)
