@@ -374,38 +374,44 @@ a {
   cursor: none !important;
 }
 
-.dot-cursor-defs {
-  position: absolute;
-  width: 0;
-  height: 0;
-  overflow: hidden;
-}
-
-/* A negative of whatever is underneath: white blended with "difference"
-   inverts the colours behind it, so the dot always shows in their contrast.
-   The goo filter fuses the trailing blobs into one slimy shape. */
-.dot-cursor {
+/* A drop of liquid glass: the page seen through it, softly blurred, brighter
+   and richer, cut to the slime's outline (clip-path, set per frame), with a lit
+   rim drawn along the same outline. */
+.glass-cursor {
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
   pointer-events: none;
   opacity: 0;
-  filter: url(#dot-goo);
-  mix-blend-mode: difference;
+  transition: opacity 0.2s ease;
   will-change: transform;
 }
 
-.dot-cursor-blob {
+.glass-cursor-glass {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  border-radius: 50%;
-  background: #fff;
+  inset: 0;
+  background: rgb(255 255 255 / 0.08);
+  -webkit-backdrop-filter: blur(0.8px) saturate(1.8) brightness(1.12) contrast(1.05);
+  backdrop-filter: blur(0.8px) saturate(1.8) brightness(1.12) contrast(1.05);
 }
 
-.dot-cursor[data-visible] {
+.glass-cursor[data-visible] {
   opacity: 1;
+}
+
+.glass-cursor-rim {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.glass-cursor-edge {
+  fill: url(#glass-sheen);
+  stroke: url(#glass-rim);
+  stroke-width: 1.6px;
+  /* a fine dark line just outside, so the clear glass shows on the pale page */
+  filter: drop-shadow(0 0 0.6px rgb(0 0 0 / 0.45)) drop-shadow(0 1.5px 3px rgb(0 0 0 / 0.12));
 }
 
 /* ---------- Decoding text ---------- */
