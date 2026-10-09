@@ -547,10 +547,9 @@ a {
 }
 
 .cs-tagline {
-  font-family: var(--serif);
-  font-size: calc(24 * var(--u));
-  font-weight: 600;
-  letter-spacing: -0.05em;
+  /* body font (Inter Display), same size and spacing as the article text */
+  font-size: calc(19 * var(--u));
+  font-weight: 400;
   text-align: right;
   opacity: 0.9;
 }
@@ -680,7 +679,7 @@ a {
     font-size: 31px;
   }
   .cs-tagline {
-    font-size: 17px;
+    font-size: 14.5px;
     text-align: left;
   }
   .cs-head-inner {
