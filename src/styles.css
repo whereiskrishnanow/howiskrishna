@@ -446,19 +446,21 @@ a {
   position: relative;
   z-index: 1;
   --cs-max: calc(840 * var(--u) + 2 * var(--cs-gutter));
+  --band-h: calc(210 * var(--u));
   max-width: var(--cs-max);
   margin: 0 auto;
-  padding: 30vh var(--cs-gutter) calc(160 * var(--u));
+  /* the article starts below the band and its glow */
+  padding: calc(var(--band-h) * 1.45) var(--cs-gutter) calc(160 * var(--u));
   animation: fade 0.5s ease both;
 }
 
-/* A long, thin arrow back to the home page, just above the title; it rises
-   and pins with the header, lined up with everything else. */
+/* A long, thin arrow back to the home page, on the band above the title. */
 .cs-back {
   display: inline-block;
-  margin-bottom: calc(18 * var(--u));
+  margin-bottom: calc(10 * var(--u));
   padding: 8px 8px 8px 0;
-  color: var(--ink-soft);
+  color: var(--head-ink);
+  opacity: 0.85;
   pointer-events: auto; /* the header itself lets clicks through */
   transition: color 0.2s;
 }
@@ -475,7 +477,7 @@ a {
 }
 .cs-back:hover,
 .cs-back:focus-visible {
-  color: var(--ink);
+  opacity: 1;
   outline: none;
 }
 .cs-back:hover svg,
@@ -483,12 +485,40 @@ a {
   transform: translateX(-6px);
 }
 
-/* Title, tagline and the wide blurred band: rises with the page, then pins. */
+/* The blurred band across the top of the page, edge to edge, with the back
+   arrow, title and tagline on it. It stays put; the article scrolls up into
+   its glow. */
 .cs-head {
-  position: sticky;
-  top: calc(16 * var(--u));
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
   z-index: 2;
+  overflow-x: clip; /* the glow spills past the screen sides */
   pointer-events: none;
+  color: var(--head-ink);
+}
+
+/* white text over the lighter parts of the glow: a soft shadow keeps it legible */
+.cs-head[data-ink='white'] .cs-head-inner {
+  text-shadow: 0 1px 14px rgb(0 0 0 / 0.28);
+}
+.cs-head[data-ink='white'] .cs-back svg {
+  filter: drop-shadow(0 1px 6px rgb(0 0 0 / 0.3));
+}
+
+.cs-head-inner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: var(--cs-max);
+  height: var(--band-h);
+  margin: 0 auto;
+  padding: 0 var(--cs-gutter) calc(26 * var(--u));
 }
 
 .cs-titlebar {
@@ -512,13 +542,18 @@ a {
   font-size: calc(24 * var(--u));
   font-weight: 600;
   letter-spacing: -0.05em;
-  color: var(--ink-soft);
   text-align: right;
+  opacity: 0.9;
 }
 
 .cs-band {
-  --h: calc(130 * var(--u));
+  --h: var(--band-h);
+  --edge-room: 0px; /* starts at the very top of the screen */
   --i: 0;
+}
+
+.cs-band .media {
+  width: 100%;
 }
 
 /* The article; it slides up under the band and is hidden above its top edge. */
@@ -627,10 +662,7 @@ a {
 @media (max-width: 767.98px) {
   .cs {
     --cs-gutter: 18px;
-    padding-top: 26vh;
-  }
-  .cs-head {
-    top: 12px;
+    --band-h: 170px;
   }
   .cs-titlebar {
     flex-direction: column;
@@ -643,11 +675,11 @@ a {
     font-size: 17px;
     text-align: left;
   }
-  .cs-band {
-    --h: 86px;
+  .cs-head-inner {
+    padding-bottom: 18px;
   }
   .cs-body {
-    padding: 47px 0 0;
+    padding: 0;
     font-size: 14.5px; /* same as the home page's intro text on phones */
   }
 }

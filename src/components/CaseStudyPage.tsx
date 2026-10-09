@@ -1,4 +1,5 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { inkForHex, measureInk, type Ink } from '../lib/tone'
 import { navigate } from '../hooks/useRoute'
 import { caseStudies, type Block } from '../caseStudies'
 import type { Project } from '../content'
@@ -81,6 +82,20 @@ export function CaseStudyPage({ project }: { project: Project }) {
   const band = useRef<HTMLDivElement>(null)
   const body = useRef<HTMLDivElement>(null)
 
+  // The title sits on the band, so it takes white or black, whichever reads
+  // better on this project's picture (same choice as the home page hover).
+  const [ink, setInk] = useState<Ink>(project.ink ?? inkForHex(project.tint))
+  useEffect(() => {
+    if (project.ink) return
+    let live = true
+    measureInk(project.image)
+      .then((i) => live && setInk(i))
+      .catch(() => {})
+    return () => {
+      live = false
+    }
+  }, [project.image, project.ink])
+
   // before paint, so the page transition captures the top of the page
   useLayoutEffect(() => {
     window.scrollTo(0, 0)
@@ -94,17 +109,17 @@ export function CaseStudyPage({ project }: { project: Project }) {
     }
   }, [project.id, project.title])
 
-  // Fade the article out as it slides up under the band: fully hidden by the
-  // middle of the band, so nothing shows through its dark top, and fading in
-  // over its soft lower glow.
+  // Fade the article out as it scrolls up into the band: fully hidden by the
+  // band's lower edge, so nothing shows behind the title, and fading in over
+  // the soft glow beneath it.
   useEffect(() => {
     let raf = 0
     const update = () => {
       raf = 0
       if (!band.current || !body.current) return
       const b = band.current.getBoundingClientRect()
-      const gone = b.top + b.height * 0.75 - body.current.getBoundingClientRect().top // hidden above this
-      const clear = gone + b.height * 0.9 // fully visible below this
+      const gone = b.bottom - body.current.getBoundingClientRect().top // hidden above this
+      const clear = gone + b.height * 0.85 // fully visible below this
       body.current.style.maskImage =
         clear > 0 ? `linear-gradient(to bottom, transparent ${gone}px, #000 ${clear}px)` : ''
     }
@@ -123,29 +138,31 @@ export function CaseStudyPage({ project }: { project: Project }) {
 
   return (
     <article className="cs">
-      <header className="cs-head">
-        <a
-          className="cs-back"
-          href="#/"
-          aria-label="Back to home"
-          onClick={(e) => {
-            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
-            e.preventDefault()
-            navigate('#/', project.id)
-          }}
-        >
-          <svg viewBox="0 0 44 14" aria-hidden="true">
-            <path d="M43 7H1.5M7.5 1 1.5 7l6 6" />
-          </svg>
-        </a>
-        <div className="cs-titlebar">
-          <h1 className="cs-title">{project.title}</h1>
-          <p className="cs-tagline">
-            <Scramble text={study?.tagline ?? project.description} delay={150} duration={700} />
-          </p>
-        </div>
+      <header className="cs-head" data-ink={ink} style={{ '--head-ink': ink === 'white' ? '#fff' : '#000' } as CSSProperties}>
         <div className="cs-band" ref={band}>
           <BlurMedia project={project} />
+        </div>
+        <div className="cs-head-inner">
+          <a
+            className="cs-back"
+            href="#/"
+            aria-label="Back to home"
+            onClick={(e) => {
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+              e.preventDefault()
+              navigate('#/', project.id)
+            }}
+          >
+            <svg viewBox="0 0 44 14" aria-hidden="true">
+              <path d="M43 7H1.5M7.5 1 1.5 7l6 6" />
+            </svg>
+          </a>
+          <div className="cs-titlebar">
+            <h1 className="cs-title">{project.title}</h1>
+            <p className="cs-tagline">
+              <Scramble text={study?.tagline ?? project.description} delay={150} duration={700} />
+            </p>
+          </div>
         </div>
       </header>
 
