@@ -133,11 +133,11 @@ a {
   margin-left: calc(165 * var(--u));
 }
 
-/* On large screens the gap scales up with everything else and starts to feel
+/* On large screens (from a 14" MacBook Pro up) the gap scales up with everything else and starts to feel
    detached; pull the cards in closer to the intro. */
-@media (min-width: 1600px) {
+@media (min-width: 1500px) {
   .projects {
-    margin-left: calc(122 * var(--u));
+    margin-left: calc(110 * var(--u));
   }
 }
 
