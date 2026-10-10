@@ -130,14 +130,14 @@ a {
   top: calc(-8 * var(--u)); /* labels sit a touch above the headline's baseline */
   display: flex;
   gap: calc(120 * var(--u));
-  margin-left: calc(260 * var(--u));
+  margin-left: calc(285 * var(--u));
 }
 
 /* On large screens (from a 14" MacBook Pro up) the gap scales up with everything else and starts to feel
    detached; pull the cards in closer to the intro. */
 @media (min-width: 1500px) {
   .projects {
-    margin-left: calc(165 * var(--u));
+    margin-left: calc(190 * var(--u));
   }
 }
 
