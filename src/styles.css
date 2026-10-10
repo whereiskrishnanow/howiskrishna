@@ -137,7 +137,7 @@ a {
    detached; pull the cards in closer to the intro. */
 @media (min-width: 1500px) {
   .projects {
-    margin-left: calc(110 * var(--u));
+    margin-left: calc(70 * var(--u));
   }
 }
 
