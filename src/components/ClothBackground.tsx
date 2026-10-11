@@ -154,7 +154,27 @@ export function ClothBackground() {
       pointer.fresh = true
     }
 
+    // Theme switch: the old page is pulled off like a sheet (lib/theme.ts), and
+    // its trailing edge drags across this cloth on the way, toward the bottom left.
+    let sweep = { start: 0, ms: 0 }
+    const onPull = (e: Event) => {
+      sweep = { start: performance.now(), ms: (e as CustomEvent<number>).detail }
+    }
+    const drag = () => {
+      const t = (performance.now() - sweep.start) / sweep.ms
+      if (!sweep.ms || t > 1) return
+      const s = Math.max(0, (t - 0.2) / 0.8) ** 1.9 // matches the sheet's yank
+      const edge = 1 - s // the trailing edge, along the diagonal (1 = top right)
+      for (let y = 1; y < gh - 1; y++) {
+        for (let x = 1; x < gw - 1; x++) {
+          const d = (x / gw + (gh - y) / gh) / 2 - edge
+          if (d * d < 0.01) vel[y * gw + x] -= 0.1 * Math.exp(-d * d / 0.002)
+        }
+      }
+    }
+
     const step = () => {
+      drag()
       // the moving cursor presses a soft dent into the cloth, deeper when faster
       if (pointer.fresh) {
         const speed = Math.min(Math.hypot(pointer.dx, pointer.dy), 6)
@@ -242,7 +262,9 @@ export function ClothBackground() {
     window.addEventListener('pointermove', onMove, { passive: true })
     window.addEventListener('resize', resize)
     window.addEventListener('portfolio:theme', setTone)
+    window.addEventListener('portfolio:sheet-pull', onPull)
     return () => {
+      window.removeEventListener('portfolio:sheet-pull', onPull)
       window.removeEventListener('portfolio:theme', setTone)
       cancelAnimationFrame(raf)
       window.removeEventListener('pointermove', onMove)
