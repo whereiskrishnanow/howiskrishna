@@ -3,6 +3,7 @@ import { contacts, intro, projects } from '../content'
 import { useActiveProject } from '../hooks/useActiveProject'
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll'
 import { useBlurTail } from '../hooks/useBlurTail'
+import { useBlurDepth } from '../hooks/useBlurDepth'
 import { Backdrop } from './Backdrop'
 import { ProjectCard } from './ProjectCard'
 import { Scramble } from './Scramble'
@@ -12,6 +13,7 @@ export function HomePage() {
   const { activeId, ink, activate, deactivate } = useActiveProject(projects)
   const projectsRef = useRef<HTMLUListElement>(null)
   useBlurTail(projectsRef)
+  useBlurDepth(projectsRef)
 
   // "Mail" copies the address too (and still opens the mail app if there is
   // one), with a short note to say so.

@@ -247,9 +247,24 @@ a {
   height: var(--h);
   overflow: hidden;
   filter: blur(calc(var(--edge-blur) + var(--h) * var(--blur)));
-  /* the tail leans the way the cursor moves (set by useBlurTail; 0 on phones) */
-  translate: calc(var(--tail-x, 0) * var(--lean, 0) * var(--h) * 0.16)
-    calc(var(--tail-y, 0) * var(--lean, 0) * var(--h) * 0.11);
+  /* The tail leans the way the cursor moves (useBlurTail), and each layer sits a
+     little further back the softer it is, so it drifts against the cursor
+     (useBlurDepth): parallax. Both are 0 on phones. */
+  translate:
+    calc((var(--tail-x, 0) * 0.16 - var(--tx, 0) * 0.1) * var(--lean, 0) * var(--h))
+    calc((var(--tail-y, 0) * 0.11 - var(--ty, 0) * 0.07) * var(--lean, 0) * var(--h));
+}
+
+/* The card turns slightly to face the cursor (useBlurDepth). Desktop only. */
+@media (hover: hover) and (pointer: fine) and (min-width: 768px) {
+  .project .media {
+    transform: perspective(calc(var(--h) * 5)) rotateY(calc(var(--tx, 0) * 9deg))
+      rotateX(calc(var(--ty, 0) * -7deg));
+  }
+  /* opening a card: hand the flat card to the page transition */
+  .project-link[data-morph] .media {
+    transform: none;
+  }
 }
 
 .media-img {
