@@ -849,113 +849,34 @@ a {
 
 /* ---------- Light / dark switch ---------- */
 
-/* Bottom right, on the same line as the contact links. */
+/* Bottom right, on the same line as the contact links, and set like them. */
 .theme-switch {
-  --size: calc(22 * var(--u));
   position: fixed;
   right: var(--gutter);
   bottom: calc(86.5 * var(--u));
   z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: calc(10 * var(--u));
-  height: calc(19 * var(--u) * 1.21); /* the links' line height */
   padding: 0;
   border: 0;
   background: none;
   color: var(--ink-soft);
   font: inherit;
-  font-size: calc(15 * var(--u));
+  font-size: calc(19 * var(--u));
+  letter-spacing: inherit;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: color 0.2s;
+  text-decoration-line: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  transition:
+    color 0.2s,
+    text-decoration-color 0.2s;
 }
 .theme-switch:hover,
 .theme-switch:focus-visible {
   color: var(--ink);
+  text-decoration-color: currentColor;
   outline: none;
-}
-
-.theme-switch-label {
-  opacity: 0;
-  transform: translateX(6px);
-  transition:
-    opacity 0.25s ease,
-    transform 0.4s var(--ease-out);
-}
-.theme-switch:hover .theme-switch-label,
-.theme-switch:focus-visible .theme-switch-label {
-  opacity: 0.8;
-  transform: none;
-}
-
-.theme-switch svg {
-  width: var(--size);
-  height: var(--size);
-  overflow: visible;
-}
-
-.theme-switch-rays line {
-  stroke: currentColor;
-  stroke-width: 1.6;
-  stroke-linecap: round;
-}
-.theme-switch-rays,
-.theme-switch-disc,
-.theme-switch-shadow {
-  transform-box: view-box;
-  transform-origin: 12px 12px;
-  transition: transform 0.7s var(--ease-out);
-}
-.theme-switch-disc {
-  fill: currentColor;
-}
-/* light: a full sun, the shadow parked off to the top right */
-.theme-switch-shadow {
-  transform: translate(13px, -13px);
-}
-/* dark: rays drawn in, the disc swells and the shadow slides over it: a crescent */
-.theme-switch[data-theme-state='dark'] .theme-switch-rays {
-  transform: rotate(90deg) scale(0.3);
-  opacity: 0;
-  transition:
-    transform 0.6s var(--ease-out),
-    opacity 0.3s ease;
-}
-.theme-switch[data-theme-state='dark'] .theme-switch-disc {
-  transform: scale(1.5);
-}
-.theme-switch[data-theme-state='dark'] .theme-switch-shadow {
-  transform: translate(3.4px, -2.8px) scale(0.86);
-}
-.theme-switch-rays {
-  transition:
-    transform 0.6s var(--ease-out),
-    opacity 0.4s ease 0.15s;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /* hover: the sun's rays turn slowly, the moon rocks */
-  .theme-switch[data-theme-state='light']:hover .theme-switch-rays {
-    animation: rays 6s linear infinite;
-  }
-  .theme-switch[data-theme-state='dark']:hover svg {
-    animation: rock 2.4s ease-in-out infinite;
-  }
-}
-@keyframes rays {
-  to {
-    rotate: 360deg;
-  }
-}
-@keyframes rock {
-  0%,
-  100% {
-    rotate: -10deg;
-  }
-  50% {
-    rotate: 12deg;
-  }
 }
 
 /* ---------- Desktop: the document scrolls sideways ---------- */
@@ -1022,11 +943,10 @@ a {
   }
 
   .theme-switch {
-    --size: 22px;
-    top: 22px;
+    top: 24px;
     right: 18px;
     bottom: auto;
-    height: 22px;
+    font-size: 14.5px; /* the phone body size */
   }
 
   .contact {
