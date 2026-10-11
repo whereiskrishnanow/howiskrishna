@@ -18,8 +18,8 @@ const apply = (theme: Theme) => {
   window.dispatchEvent(new Event('portfolio:theme'))
 }
 
-// On desktop the switch pulls the old background away like a sheet, with a
-// hand (src/sheet, three.js: loaded only when the switch is first used).
+// On desktop the switch pulls the old background away like a sheet (src/sheet,
+// three.js: loaded only when the switch is first used).
 const fancy = () =>
   !isLite() &&
   !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
@@ -28,7 +28,7 @@ const sheet = () => import('../sheet/pullSheet')
 
 /** Get the sheet animation ready (on hover over the switch). */
 export const warmTheme = () => {
-  if (fancy()) sheet().then((m) => m.warm()).catch(() => {})
+  if (fancy()) sheet().catch(() => {})
 }
 
 /** Switch theme. Returns false if a switch is already playing. */
