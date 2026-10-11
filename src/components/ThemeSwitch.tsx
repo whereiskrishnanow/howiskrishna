@@ -25,7 +25,7 @@ export function ThemeSwitch() {
       // the label changes straight away; the page follows as the sheet comes off
       onClick={() => setTheme(next) && setLocal(next)}
     >
-      <Scramble key={next} text={next === 'dark' ? 'Dark mode' : 'Light mode'} duration={500} />
+      <Scramble key={next} text={next === 'dark' ? 'Dark' : 'Light'} duration={500} />
     </button>
   )
 }
