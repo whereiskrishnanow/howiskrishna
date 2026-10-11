@@ -247,6 +247,9 @@ a {
   height: var(--h);
   overflow: hidden;
   filter: blur(calc(var(--edge-blur) + var(--h) * var(--blur)));
+  /* the tail leans the way the cursor moves (set by useBlurTail; 0 on phones) */
+  translate: calc(var(--tail-x, 0) * var(--lean, 0) * var(--h) * 0.09)
+    calc(var(--tail-y, 0) * var(--lean, 0) * var(--h) * 0.06);
 }
 
 .media-img {

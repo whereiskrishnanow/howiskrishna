@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { contacts, intro, projects } from '../content'
 import { useActiveProject } from '../hooks/useActiveProject'
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll'
+import { useBlurTail } from '../hooks/useBlurTail'
 import { Backdrop } from './Backdrop'
 import { ProjectCard } from './ProjectCard'
 import { Scramble } from './Scramble'
@@ -9,6 +10,8 @@ import { Scramble } from './Scramble'
 export function HomePage() {
   useHorizontalScroll()
   const { activeId, ink, activate, deactivate } = useActiveProject(projects)
+  const projectsRef = useRef<HTMLUListElement>(null)
+  useBlurTail(projectsRef)
 
   // "Mail" copies the address too (and still opens the mail app if there is
   // one), with a short note to say so.
@@ -39,7 +42,7 @@ export function HomePage() {
             </p>
           </header>
 
-          <ul className="projects" aria-label="Selected work">
+          <ul ref={projectsRef} className="projects" aria-label="Selected work">
             {projects.map((project, i) => (
               <ProjectCard
                 key={project.id}

@@ -29,6 +29,9 @@ const LAYERS = Array.from({ length: STEPS }, (_, i) => {
     blur: blur.toFixed(4),
     // top copies are too sharp on their own; top up their picture blur
     fill: Math.max(0, MIN_FILL_BLUR - blur),
+    // how far this copy leans with the cursor (see useBlurTail): the crisp top
+    // stays put, the soft tail swings
+    lean: ((i / (STEPS - 1)) ** 1.5).toFixed(3),
     mask: `linear-gradient(to bottom, ${stops.join(', ')})`,
   }
 })
@@ -76,7 +79,7 @@ export function BlurMedia({ project }: { project: Pick<Project, 'image' | 'tint'
               project={project}
               className="media-frame"
               fill={layer.fill}
-              style={{ '--blur': layer.blur } as CSSProperties}
+              style={{ '--blur': layer.blur, '--lean': layer.lean } as CSSProperties}
             />
           </span>
         ))}
