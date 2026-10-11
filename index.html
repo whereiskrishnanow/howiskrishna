@@ -9,14 +9,24 @@
     <meta property="og:description" content="Hey there, please come check out a piece on my canvas when you get a moment — I’d really appreciate your thoughts. Thank you!" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="theme-color" content="#eeeeee" />
+    <script>
+      // light/dark before the first paint: the saved choice, else the system's
+      try {
+        var t = localStorage.getItem('theme')
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        document.documentElement.dataset.theme = t
+        if (t === 'dark') document.querySelector('meta[name="theme-color"]').content = '#131313'
+      } catch (e) {}
+    </script>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="favicon-48.png" type="image/png" sizes="48x48" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..600;1,14..32,400&family=Libre+Caslon+Condensed:wght@600&display=swap" rel="stylesheet" />
-    <script type="module" crossorigin src="./assets/index-D3TvgXRl.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-CtvjnS-j.css">
+    <script type="module" crossorigin src="./assets/index-B4Dx2Gt_.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-nz-mv1oi.css">
   </head>
   <body>
     <div id="root"></div>
