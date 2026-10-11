@@ -1,7 +1,7 @@
 // A sheet of cloth lying on a table (z = 0, +z towards the viewer): a grid of
 // particles moved by Verlet integration and held together by distance
 // constraints (stretch, shear and bend), with friction against the table.
-// A few particles can be pinched and dragged around.
+// A corner of it can be taken hold of and dragged around.
 
 const GRAVITY = 2600 // px/s², pulling towards the table
 const DAMPING = 0.996 // velocity kept per step (air resistance)
@@ -16,8 +16,8 @@ export class Cloth {
   private links: number[] = [] // pairs of particle indices
   private rest: number[] = [] // their rest lengths
   private stiff: number[] = []
-  private held = new Map<number, [number, number]>() // particle → offset from the pinch, at rest
-  private tether: Float32Array // each particle's rest distance from the pinch
+  private held = new Map<number, [number, number, number]>() // particle → offset from the grip at rest, and how firmly it's held
+  private tether: Float32Array // each particle's rest distance from the grip
 
   constructor(width: number, height: number, cols: number) {
     this.cols = cols
@@ -48,26 +48,30 @@ export class Cloth {
           link(id(r, c), id(r + 1, c + 1), 0.7) // shear
           link(id(r, c + 1), id(r + 1, c), 0.7)
         }
-        if (c + 2 < cols) link(id(r, c), id(r, c + 2), 0.45) // bend: keeps folds soft and round
-        if (r + 2 < this.rows) link(id(r, c), id(r + 2, c), 0.45)
+        if (c + 2 < cols) link(id(r, c), id(r, c + 2), 0.6) // bend: keeps folds soft and round
+        if (r + 2 < this.rows) link(id(r, c), id(r + 2, c), 0.6)
       }
     }
   }
 
-  /** Pinch the cloth around (x, y): the particles within `radius` are held from now on. */
+  /**
+   * Take hold of the cloth around (x, y). The grip is soft: firm at the centre,
+   * fading to nothing at `radius`, so the cloth rounds over it instead of
+   * being pinched to a point.
+   */
   grab(x: number, y: number, radius: number) {
     for (let i = 0; i < this.pos.length / 3; i++) {
       const dx = this.pos[i * 3] - x
       const dy = this.pos[i * 3 + 1] - y
       const d = Math.hypot(dx, dy)
-      if (d < radius) this.held.set(i, [dx, dy])
+      if (d < radius) this.held.set(i, [dx, dy, (1 - d / radius) ** 2])
       // however hard it's pulled, no part of the cloth gets further from the
-      // pinch than it was: stops the sheet stretching like rubber on a fast yank
+      // grip than it was: stops the sheet stretching like rubber on a fast yank
       this.tether[i] = d + radius
     }
   }
 
-  /** One time step. The pinch is at `at`; `gather` (1 → 0) bunches the held cloth together. */
+  /** One time step. The grip is at `at`; `gather` (1 → 0) draws the held cloth together. */
   step(dt: number, at: [number, number, number], gather: number) {
     const p = this.pos
     const q = this.prev
@@ -111,10 +115,11 @@ export class Cloth {
           p[j + 2] = at[2] + dz * s
         }
       }
-      for (const [i, [ox, oy]] of this.held) {
-        p[i * 3] = at[0] + ox * gather
-        p[i * 3 + 1] = at[1] + oy * gather
-        p[i * 3 + 2] = at[2]
+      for (const [i, [ox, oy, w]] of this.held) {
+        const j = i * 3
+        p[j] += (at[0] + ox * gather - p[j]) * w
+        p[j + 1] += (at[1] + oy * gather - p[j + 1]) * w
+        p[j + 2] += (at[2] - p[j + 2]) * w
       }
     }
     // the table: the cloth can't sink through it, and drags while it touches it

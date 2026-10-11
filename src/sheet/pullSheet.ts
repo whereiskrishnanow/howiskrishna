@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { Cloth } from './cloth'
 
 // The theme switch on desktop. The page's background cloth (as it looks right
-// now) becomes a real sheet lying on the screen; it's pinched near the bottom-
+// now) becomes a real sheet lying on the screen; it's taken by the bottom-
 // right corner, tugged, then yanked away towards the bottom right, uncovering
 // the new background underneath. The sheet is drawn below the page's content,
 // so only the cloth goes.
@@ -54,7 +54,8 @@ export async function pullSheet(onUncovered: () => void, onTone: () => void) {
   key.castShadow = true
   Object.assign(key.shadow.camera, { left: -W, right: W, top: H, bottom: -H, near: H * 0.5, far: H * 4 })
   key.shadow.mapSize.set(2048, 2048)
-  key.shadow.radius = 6
+  key.shadow.radius = 14 // soft-edged shadows in the folds
+  key.shadow.blurSamples = 16
   key.shadow.bias = -0.0004
   key.shadow.normalBias = 1.5
   ground.add(
@@ -87,8 +88,8 @@ export async function pullSheet(onUncovered: () => void, onTone: () => void) {
 
   const path = pullPath(W, H)
   const positions = sheet.geometry.attributes.position as THREE.BufferAttribute
-  const pinch = path(0).at
-  cloth.grab(pinch[0], pinch[1], H * 0.06)
+  const grip = path(0).at
+  cloth.grab(grip[0], grip[1], H * 0.16)
   let simTime = 0
   let uncovered = false
 
@@ -156,31 +157,32 @@ const clamp01 = (x: number) => Math.min(1, Math.max(0, x))
 const mix = (a: number, b: number, x: number) => a + (b - a) * x
 
 /**
- * Where the pinched cloth is pulled over time, and how tightly it's bunched:
- * pinched up, a short tug, then the yank.
+ * Where the corner is pulled over time, and how much the held cloth is drawn
+ * together: lifted, a short tug, then the yank.
  */
 function pullPath(W: number, H: number) {
   const away = new THREE.Vector2(1, -0.72).normalize() // towards the bottom right
-  const gx = W / 2 - 0.12 * H // the pinch, near the bottom-right corner
-  const gy = -H / 2 + 0.12 * H
+  const gx = W / 2 - 0.03 * H // taken by the corner
+  const gy = -H / 2 + 0.03 * H
   const reach = Math.hypot(W, H) * 2.4 // how far the yank carries it
 
   return (t: number) => {
     let along = 0 // distance travelled towards the bottom right
     let z = 0
-    let gather = 0.35
-    if (t < 0.16) {
-      const s = easeInOut(t / 0.16) // pinch the cloth up into a bunch
-      z = H * 0.04 * s
-      gather = mix(1, 0.35, s)
-    } else if (t < 0.38) {
-      const s = easeInOut((t - 0.16) / 0.22) // tug
-      along = H * 0.05 * s
-      z = mix(H * 0.04, H * 0.09, s)
+    let gather = 0.7
+    if (t < 0.3) {
+      const s = easeInOut(t / 0.3) // lift the corner, drawing it together a little
+      z = H * 0.07 * s
+      along = H * 0.02 * s
+      gather = mix(1, 0.7, s)
+    } else if (t < 0.52) {
+      const s = easeInOut((t - 0.3) / 0.22) // tug
+      along = mix(H * 0.02, H * 0.08, s)
+      z = mix(H * 0.07, H * 0.1, s)
     } else {
-      const s = (t - 0.38) / 0.9 // yank: accelerates, then keeps going
-      along = H * 0.05 + reach * (s < 1 ? s * s : 2 * s - 1)
-      z = H * 0.09 + H * 0.32 * easeOut(clamp01(s))
+      const s = (t - 0.52) / 0.9 // yank: accelerates, then keeps going
+      along = H * 0.08 + reach * (s < 1 ? s * s : 2 * s - 1)
+      z = H * 0.1 + H * 0.3 * easeOut(clamp01(s))
     }
     return { at: [gx + away.x * along, gy + away.y * along, z] as [number, number, number], gather }
   }
