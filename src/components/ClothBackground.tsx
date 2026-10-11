@@ -81,8 +81,8 @@ export function ClothBackground() {
 
     // #eee silk by day; at night #131313 with the folds caught in a softer light
     const toneLoc = gl.getUniformLocation(prog, 'tone')
-    const setTone = () =>
-      document.documentElement.dataset.theme === 'dark'
+    const setTone = (theme = document.documentElement.dataset.theme) =>
+      theme === 'dark'
         ? gl.uniform3f(toneLoc, 0.0745, 0.11, 0.05)
         : gl.uniform3f(toneLoc, 0.9333, 0.16, 0.035)
     setTone()
@@ -154,27 +154,7 @@ export function ClothBackground() {
       pointer.fresh = true
     }
 
-    // Theme switch: the old page is pulled off like a sheet (lib/theme.ts), and
-    // its trailing edge drags across this cloth on the way, toward the bottom left.
-    let sweep = { start: 0, ms: 0 }
-    const onPull = (e: Event) => {
-      sweep = { start: performance.now(), ms: (e as CustomEvent<number>).detail }
-    }
-    const drag = () => {
-      const t = (performance.now() - sweep.start) / sweep.ms
-      if (!sweep.ms || t > 1) return
-      const s = Math.max(0, (t - 0.2) / 0.8) ** 1.9 // matches the sheet's yank
-      const edge = 1 - s // the trailing edge, along the diagonal (1 = top right)
-      for (let y = 1; y < gh - 1; y++) {
-        for (let x = 1; x < gw - 1; x++) {
-          const d = (x / gw + (gh - y) / gh) / 2 - edge
-          if (d * d < 0.01) vel[y * gw + x] -= 0.1 * Math.exp(-d * d / 0.002)
-        }
-      }
-    }
-
     const step = () => {
-      drag()
       // the moving cursor presses a soft dent into the cloth, deeper when faster
       if (pointer.fresh) {
         const speed = Math.min(Math.hypot(pointer.dx, pointer.dy), 6)
@@ -261,11 +241,15 @@ export function ClothBackground() {
 
     window.addEventListener('pointermove', onMove, { passive: true })
     window.addEventListener('resize', resize)
-    window.addEventListener('portfolio:theme', setTone)
-    window.addEventListener('portfolio:sheet-pull', onPull)
+    // the theme switch pulls this cloth's old look away as a sheet (src/sheet),
+    // switching the tone underneath it first
+    const onTheme = () => setTone()
+    const onClothTone = (e: Event) => setTone((e as CustomEvent<string>).detail)
+    window.addEventListener('portfolio:theme', onTheme)
+    window.addEventListener('portfolio:cloth-tone', onClothTone)
     return () => {
-      window.removeEventListener('portfolio:sheet-pull', onPull)
-      window.removeEventListener('portfolio:theme', setTone)
+      window.removeEventListener('portfolio:theme', onTheme)
+      window.removeEventListener('portfolio:cloth-tone', onClothTone)
       cancelAnimationFrame(raf)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('resize', resize)

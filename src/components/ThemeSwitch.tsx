@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { currentTheme, setTheme, type Theme } from '../lib/theme'
+import { currentTheme, setTheme, warmTheme, type Theme } from '../lib/theme'
 import { Scramble } from './Scramble'
 
 // The light/dark switch: a small sun that an eclipse turns into a crescent moon.
@@ -27,11 +27,15 @@ export function ThemeSwitch() {
       className="theme-switch"
       data-theme-state={theme}
       aria-label={`Switch to ${next} mode`}
-      onPointerEnter={(e) => e.pointerType !== 'touch' && setHover(true)}
+      onPointerEnter={(e) => {
+        warmTheme()
+        if (e.pointerType !== 'touch') setHover(true)
+      }}
       onPointerLeave={() => setHover(false)}
       onFocus={(e) => e.currentTarget.matches(':focus-visible') && setHover(true)}
       onBlur={() => setHover(false)}
-      onClick={() => setTheme(next)}
+      // the icon turns straight away; the page follows as the sheet comes off
+      onClick={() => setTheme(next) && setLocal(next)}
     >
       <span className="theme-switch-label" aria-hidden="true">
         <Scramble key={next} text={next === 'dark' ? 'Dark' : 'Light'} active={hover} duration={380} />
