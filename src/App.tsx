@@ -5,6 +5,7 @@ import { CaseStudyPage } from './components/CaseStudyPage'
 import { ClothBackground } from './components/ClothBackground'
 import { DotCursor } from './components/DotCursor'
 import { HomePage } from './components/HomePage'
+import { ThemeSwitch } from './components/ThemeSwitch'
 import { useRoute } from './hooks/useRoute'
 
 export function App() {
@@ -17,6 +18,7 @@ export function App() {
     <>
       {cloth && <ClothBackground />}
       {project ? <CaseStudyPage key={project.id} project={project} /> : <HomePage />}
+      <ThemeSwitch />
       <DotCursor />
     </>
   )

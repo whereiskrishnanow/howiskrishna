@@ -32,6 +32,30 @@
     --ink-soft 0.5s ease;
 }
 
+/* Dark mode (the switch at the bottom right). Hovering a card still re-inks
+   the page for that card's picture, below. */
+:root[data-theme='dark'] {
+  --bg: #131313;
+  --ink: #fff;
+  --ink-soft: rgb(255 255 255 / 0.8);
+  --contrast: #fff;
+  color-scheme: dark;
+}
+
+html,
+body {
+  transition: background-color 0.5s ease; /* phones: the theme switch fades */
+}
+/* desktop: the new theme spreads from the switch instead (lib/theme.ts), so
+   nothing should fade inside it */
+html.theme-switching,
+html.theme-switching body {
+  transition: none;
+}
+html.theme-switching .cs-band .media {
+  view-transition-name: none; /* reveal the band with the rest of the page */
+}
+
 /* While a card is hovered the page takes on its picture; text flips to
    whichever of white or black reads best on it. */
 :root[data-ink='white'] {
@@ -680,6 +704,9 @@ a {
   border-radius: calc(16 * var(--u));
   box-shadow: 0 0 0 1px rgb(0 0 0 / 0.06);
 }
+:root[data-theme='dark'] .cs-phones img {
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
+}
 
 @media (max-width: 767.98px) {
   .cs-phones {
@@ -829,6 +856,117 @@ a {
   outline: none;
 }
 
+/* ---------- Light / dark switch ---------- */
+
+/* Bottom right, on the same line as the contact links. */
+.theme-switch {
+  --size: calc(22 * var(--u));
+  position: fixed;
+  right: var(--gutter);
+  bottom: calc(86.5 * var(--u));
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: calc(10 * var(--u));
+  height: calc(19 * var(--u) * 1.21); /* the links' line height */
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: calc(15 * var(--u));
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.2s;
+}
+.theme-switch:hover,
+.theme-switch:focus-visible {
+  color: var(--ink);
+  outline: none;
+}
+
+.theme-switch-label {
+  opacity: 0;
+  transform: translateX(6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.4s var(--ease-out);
+}
+.theme-switch:hover .theme-switch-label,
+.theme-switch:focus-visible .theme-switch-label {
+  opacity: 0.8;
+  transform: none;
+}
+
+.theme-switch svg {
+  width: var(--size);
+  height: var(--size);
+  overflow: visible;
+}
+
+.theme-switch-rays line {
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}
+.theme-switch-rays,
+.theme-switch-disc,
+.theme-switch-shadow {
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+  transition: transform 0.7s var(--ease-out);
+}
+.theme-switch-disc {
+  fill: currentColor;
+}
+/* light: a full sun, the shadow parked off to the top right */
+.theme-switch-shadow {
+  transform: translate(13px, -13px);
+}
+/* dark: rays drawn in, the disc swells and the shadow slides over it: a crescent */
+.theme-switch[data-theme-state='dark'] .theme-switch-rays {
+  transform: rotate(90deg) scale(0.3);
+  opacity: 0;
+  transition:
+    transform 0.6s var(--ease-out),
+    opacity 0.3s ease;
+}
+.theme-switch[data-theme-state='dark'] .theme-switch-disc {
+  transform: scale(1.5);
+}
+.theme-switch[data-theme-state='dark'] .theme-switch-shadow {
+  transform: translate(3.4px, -2.8px) scale(0.86);
+}
+.theme-switch-rays {
+  transition:
+    transform 0.6s var(--ease-out),
+    opacity 0.4s ease 0.15s;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* hover: the sun's rays turn slowly, the moon rocks */
+  .theme-switch[data-theme-state='light']:hover .theme-switch-rays {
+    animation: rays 6s linear infinite;
+  }
+  .theme-switch[data-theme-state='dark']:hover svg {
+    animation: rock 2.4s ease-in-out infinite;
+  }
+}
+@keyframes rays {
+  to {
+    rotate: 360deg;
+  }
+}
+@keyframes rock {
+  0%,
+  100% {
+    rotate: -10deg;
+  }
+  50% {
+    rotate: 12deg;
+  }
+}
+
 /* ---------- Desktop: the document scrolls sideways ---------- */
 
 @media (min-width: 768px) {
@@ -890,6 +1028,14 @@ a {
 
   .project-desc {
     font-size: 14.5px; /* matches the intro summary on phones */
+  }
+
+  .theme-switch {
+    --size: 22px;
+    top: 22px;
+    right: 18px;
+    bottom: auto;
+    height: 22px;
   }
 
   .contact {

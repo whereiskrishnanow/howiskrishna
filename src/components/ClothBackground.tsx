@@ -30,6 +30,7 @@ void main() {
 const FRAG = `#version 300 es
 precision highp float;
 uniform sampler2D normals;
+uniform vec3 tone; // resting grey, light falloff, sheen: per theme
 in vec2 uv;
 out vec4 color;
 float hash(vec2 q) { return fract(sin(dot(q, vec2(12.9898, 78.233))) * 43758.5453); }
@@ -39,7 +40,7 @@ void main() {
   vec3 halfway = normalize(light + vec3(0.0, 0.0, 1.0));
   float diffuse = dot(n, light) - light.z;           // 0 on a flat sheet
   float sheen = pow(max(dot(n, halfway), 0.0), 40.0) - pow(halfway.z, 40.0);
-  float v = 0.9333 + diffuse * 0.16 + sheen * 0.035; // #eee at rest
+  float v = tone.x + diffuse * tone.y + sheen * tone.z; // the page grey at rest
   v += (hash(gl_FragCoord.xy) - 0.5) / 255.0;       // dither: no banding
   color = vec4(vec3(v), 1.0);
 }`
@@ -77,6 +78,14 @@ export function ClothBackground() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+
+    // #eee silk by day; at night #131313 with the folds caught in a softer light
+    const toneLoc = gl.getUniformLocation(prog, 'tone')
+    const setTone = () =>
+      document.documentElement.dataset.theme === 'dark'
+        ? gl.uniform3f(toneLoc, 0.0745, 0.11, 0.05)
+        : gl.uniform3f(toneLoc, 0.9333, 0.16, 0.035)
+    setTone()
 
     // On phones (and with reduced motion) the cloth is drawn once and holds
     // still: the simulation would cost a phone every frame it has.
@@ -208,8 +217,16 @@ export function ClothBackground() {
         drape(0)
         upload()
       }
+      const onTheme = () => {
+        setTone()
+        upload()
+      }
       window.addEventListener('resize', onResize)
-      return () => window.removeEventListener('resize', onResize)
+      window.addEventListener('portfolio:theme', onTheme)
+      return () => {
+        window.removeEventListener('resize', onResize)
+        window.removeEventListener('portfolio:theme', onTheme)
+      }
     }
 
     let raf = 0
@@ -224,7 +241,9 @@ export function ClothBackground() {
 
     window.addEventListener('pointermove', onMove, { passive: true })
     window.addEventListener('resize', resize)
+    window.addEventListener('portfolio:theme', setTone)
     return () => {
+      window.removeEventListener('portfolio:theme', setTone)
       cancelAnimationFrame(raf)
       window.removeEventListener('pointermove', onMove)
       window.removeEventListener('resize', resize)
