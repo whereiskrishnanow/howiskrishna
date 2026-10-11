@@ -448,6 +448,16 @@ a {
   transform: translateX(-50%);
 }
 
+.scramble-char[data-flip]:not(.is-done)::after {
+  transform: translateX(-50%) scaleX(-1);
+}
+
+.scramble-char[data-wide]:not(.is-done)::after {
+  top: 0.12em;
+  font-size: 0.78em;
+  font-weight: 400;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

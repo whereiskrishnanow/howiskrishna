@@ -1,12 +1,23 @@
 import { useEffect, useRef } from 'react'
 
-// Text that "decodes": each character flickers through numbers, symbols and
-// shapes, then settles into the real letter, roughly left to right. Every
-// character keeps the width of its real letter, so nothing reflows while it runs.
+// Text that "decodes", Matrix-style: each character flickers through katakana,
+// Korean letters, a few kanji, digits and symbols (some of them mirrored), then
+// settles into the real letter, roughly left to right. Every character keeps the
+// width of its real letter, so nothing reflows while it runs.
 
-const GLYPHS = '0123456789#%&*+=<>/?$@◆●▲■◇○△□✦✕'
+const NARROW = Array.from(
+  'ｦｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾗﾘﾙﾚﾛﾜﾝ' + '0123456789' + ':.=*+-<>¦|ç"',
+)
+// full-width glyphs, drawn a little smaller so they don't crowd their neighbours
+const WIDE = Array.from('ㄱㄴㄷㄹㅁㅂㅅㅇㅈㅊㅋㅌㅍㅎㅏㅑㅓㅕㅗㅛㅜㅠ' + '日二十三王大中木水火')
 const FLICKER = 40 // ms between glyph changes
-const pick = () => GLYPHS[Math.floor(Math.random() * GLYPHS.length)]
+const pick = (c: HTMLElement) => {
+  const wide = Math.random() < 0.3
+  const set = wide ? WIDE : NARROW
+  c.dataset.glyph = set[Math.floor(Math.random() * set.length)]
+  c.toggleAttribute('data-wide', wide)
+  c.toggleAttribute('data-flip', Math.random() < 0.35) // the Matrix mirrors its glyphs
+}
 
 type Props = {
   text: string
@@ -35,7 +46,7 @@ export function Scramble({ text, active = true, duration = 1200, delay = 0 }: Pr
     const resolveAt = chars.map((_, i) => delay + (i / n) * duration * 0.7 + Math.random() * duration * 0.3)
     chars.forEach((c) => {
       c.classList.remove('is-done')
-      c.dataset.glyph = pick()
+      pick(c)
     })
 
     const start = performance.now()
@@ -50,7 +61,7 @@ export function Scramble({ text, active = true, duration = 1200, delay = 0 }: Pr
         if (t >= resolveAt[i]) c.classList.add('is-done')
         else {
           remaining++
-          if (flicker) c.dataset.glyph = pick()
+          if (flicker) pick(c)
         }
       })
       raf = remaining ? requestAnimationFrame(tick) : 0
