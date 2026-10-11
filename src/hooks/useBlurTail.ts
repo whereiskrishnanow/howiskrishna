@@ -6,7 +6,7 @@ import { isLite } from '../lib/device'
 // the CSS turns them into a small offset that grows with each blur layer's depth.
 // Mouse/trackpad only; phones and reduced motion keep the tails still.
 
-const FULL_SPEED = 1800 // px/s of cursor speed for the full lean
+const FULL_SPEED = 1200 // px/s of cursor speed for the full lean
 const SPEED_SMOOTHING = 0.06 // s; averages out jittery pointer events
 const SPEED_DECAY = 0.12 // s; how quickly the lean lets go once the cursor stops
 const STIFFNESS = 45 // spring pulling the tail toward its lean, per s²

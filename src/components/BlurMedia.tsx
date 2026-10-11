@@ -31,7 +31,7 @@ const LAYERS = Array.from({ length: STEPS }, (_, i) => {
     fill: Math.max(0, MIN_FILL_BLUR - blur),
     // how far this copy leans with the cursor (see useBlurTail): the crisp top
     // stays put, the soft tail swings
-    lean: ((i / (STEPS - 1)) ** 1.5).toFixed(3),
+    lean: ((i / (STEPS - 1)) ** 1.2).toFixed(3),
     mask: `linear-gradient(to bottom, ${stops.join(', ')})`,
   }
 })
