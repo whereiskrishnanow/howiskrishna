@@ -19,10 +19,23 @@ const listeners = new Set<(r: Route) => void>()
 const clearMorph = () =>
   document.querySelectorAll('[data-morph]').forEach((el) => el.removeAttribute('data-morph'))
 
+// The camera's way through: the centre of the card's picture, and how far to
+// zoom for it to more than fill the screen. Read by "Page transition" in styles.css.
+const aimAt = (card: Element | null) => {
+  if (!card) return
+  const r = card.getBoundingClientRect()
+  const root = document.documentElement.style
+  root.setProperty('--vt-x', `${r.left + r.width / 2}px`)
+  root.setProperty('--vt-y', `${r.top + r.height / 2}px`)
+  root.setProperty('--vt-zoom', (Math.max(innerWidth / r.width, innerHeight / r.height) * 1.15).toFixed(2))
+}
+const card = () => document.querySelector('.project-link[data-morph] .media')
+
 /**
- * Go to a route. Where the browser supports it, the clicked card's band and
- * title morph into the detail page's header (see "Page transition" in
- * styles.css); everywhere else it just switches.
+ * Go to a route. Where the browser supports it, the camera flies into the
+ * clicked card and out the other side into its detail page (and back out of
+ * it on the way home; see "Page transition" in styles.css); everywhere else
+ * it just switches.
  */
 export function navigate(href: string, id?: string) {
   const go = () => {
@@ -33,6 +46,7 @@ export function navigate(href: string, id?: string) {
     // going back: the card the band shrinks into is the one for this project
     if (id && route.name === 'home') {
       document.querySelector(`.project-link[href="#/work/${id}"]`)?.setAttribute('data-morph', '')
+      aimAt(card())
     }
   }
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -41,6 +55,7 @@ export function navigate(href: string, id?: string) {
     clearMorph()
     return go()
   }
+  aimAt(card())
   document.documentElement.dataset.transition = parse().name === 'home' ? 'open' : 'close'
   const t = document.startViewTransition(go)
   t.finished.finally(() => {
