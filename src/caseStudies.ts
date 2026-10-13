@@ -332,7 +332,7 @@ export const caseStudies: Record<string, CaseStudy> = {
   'i-live-assist': {
     tagline: 'Anonymous Personal AI Assistant & Notetaker',
     blocks: [
-      { type: 'images', src: [img('i-live-assist', '01.webp')], alt: 'I Live Assist over a video call' },
+      { type: 'images', src: [img('i-live-assist', '01-v2.webp')], alt: 'I Live Assist over a video call' },
       {
         type: 'p',
         text: 'Led end-to-end experience for a fully anonymous, AI-powered assistant and meeting notetaker built to help professionals navigate their day-to-day work calls more effectively. The product captures key discussion points, generates structured insights, identifies action items, and provides real-time AI assistance to help users communicate confidently, stay organized, and make better decisions—all while prioritizing user privacy and anonymity.',
@@ -364,25 +364,25 @@ export const caseStudies: Record<string, CaseStudy> = {
       { type: 'h2', text: 'Finally, here’s how it works' },
       {
         type: 'images',
-        src: [img('i-live-assist', '02.webp')],
+        src: [img('i-live-assist', '02-v2.webp')],
         alt: 'The I Live Assist overlay on screen',
         caption: { text: 'I Live Assist appears as a discreet overlay on the user’s screen, truly undetectable. Users can access it anytime to listen to conversations, ask AI for real-time assistance, or hide the interface for a distraction-free experience—all without interrupting their workflow.' },
       },
       {
         type: 'images',
-        src: [img('i-live-assist', '03.webp'), img('i-live-assist', '04.webp')],
+        src: [img('i-live-assist', '03-v2.webp'), img('i-live-assist', '04-v2.webp')],
         alt: 'Asking I Live Assist about the conversation during a call',
         caption: { text: 'The ‘Ask’ feature enables users to get instant, context-aware AI assistance during live meetings. Users can ask questions about the ongoing conversation or what’s on their screen and receive relevant answers, guidance, and actionable suggestions without interrupting their workflow or switching between applications.' },
       },
       {
         type: 'images',
-        src: [img('i-live-assist', '05.webp'), img('i-live-assist', '01.webp')],
+        src: [img('i-live-assist', '05-v2.webp'), img('i-live-assist', '01-v2.webp')],
         alt: 'The Listen feature: live transcript, key takeaways and next steps',
         caption: { text: 'The Listen feature transforms live meeting conversations into meaningful, AI-powered insights. It automatically transcribes discussions, identifies key takeaways, and recommends actionable next steps in real time, allowing users to stay engaged in conversations while AI handles the cognitive load of note-taking and information processing.' },
       },
       {
         type: 'images',
-        src: [img('i-live-assist', '06.webp')],
+        src: [img('i-live-assist', '06-v2.webp')],
         alt: 'I Live Assist settings: workspace, overlay opacity and templates',
         caption: { text: 'Users are provided a greater control over their Live Assist experience, allowing them to switch workspaces, adjust overlay opacity, customize templates. These personalization options help users tailor the assistant to their workflow while keeping it accessible and unobtrusive during meetings.' },
       },
