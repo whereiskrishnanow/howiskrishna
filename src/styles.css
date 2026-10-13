@@ -760,23 +760,23 @@ a {
 }
 
 html[data-transition='open']::view-transition-old(root) {
-  animation: vt-fade-out 0.6s ease both;
+  animation: vt-fade-out 0.45s ease both;
 }
 html[data-transition='open']::view-transition-old(card) {
-  animation: vt-into-card 1.3s cubic-bezier(0.55, 0, 0.2, 1) both;
+  animation: vt-into-card 0.95s cubic-bezier(0.55, 0, 0.2, 1) both;
 }
 html[data-transition='open']::view-transition-new(root) {
-  animation: vt-fade-in 0.8s ease 0.6s both;
+  animation: vt-fade-in 0.6s ease 0.42s both;
 }
 
 html[data-transition='close']::view-transition-old(root) {
-  animation: vt-fade-out 0.6s ease both;
+  animation: vt-fade-out 0.45s ease both;
 }
 html[data-transition='close']::view-transition-new(card) {
-  animation: vt-out-of-card 1.3s cubic-bezier(0.55, 0, 0.2, 1) both;
+  animation: vt-out-of-card 0.95s cubic-bezier(0.55, 0, 0.2, 1) both;
 }
 html[data-transition='close']::view-transition-new(root) {
-  animation: vt-fade-in 0.8s ease 0.45s both;
+  animation: vt-fade-in 0.6s ease 0.32s both;
 }
 
 @keyframes vt-fade-out {
