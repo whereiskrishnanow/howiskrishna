@@ -742,10 +742,8 @@ a {
 /* Opening a card: the view moves into that card alone. Its picture glides to
    the middle of the screen and grows until it fills it, while everything else
    just fades away where it is; then the detail page fades up through it.
-   Going home plays it backwards: the page fades as the view pulls back out of
-   the picture, which settles into its card while the home page fades in
-   around it. Only transforms and opacity animate. useRoute.ts supplies the
-   move and the zoom. */
+   Going home is a plain dissolve from one page to the other. Only transforms
+   and opacity animate. useRoute.ts supplies the move and the zoom. */
 .project-link[data-morph] .media {
   view-transition-name: card;
 }
@@ -760,23 +758,23 @@ a {
 }
 
 html[data-transition='open']::view-transition-old(root) {
-  animation: vt-fade-out 0.35s ease both;
+  animation: vt-fade-out 0.28s ease both;
 }
 html[data-transition='open']::view-transition-old(card) {
-  animation: vt-into-card 0.75s cubic-bezier(0.55, 0, 0.2, 1) both;
+  animation: vt-into-card 0.6s cubic-bezier(0.55, 0, 0.2, 1) both;
 }
 html[data-transition='open']::view-transition-new(root) {
-  animation: vt-fade-in 0.48s ease 0.33s both;
+  animation: vt-fade-in 0.38s ease 0.26s both;
 }
 
-html[data-transition='close']::view-transition-old(root) {
-  animation: vt-fade-out 0.35s ease both;
+html[data-transition='close'] .project-link[data-morph] .media {
+  view-transition-name: none; /* the card comes back with the rest of the page */
 }
-html[data-transition='close']::view-transition-new(card) {
-  animation: vt-out-of-card 0.75s cubic-bezier(0.55, 0, 0.2, 1) both;
+html[data-transition='close']::view-transition-old(root) {
+  animation: vt-fade-out 0.45s ease both;
 }
 html[data-transition='close']::view-transition-new(root) {
-  animation: vt-fade-in 0.48s ease 0.25s both;
+  animation: vt-fade-in 0.45s ease both;
 }
 
 @keyframes vt-fade-out {
@@ -796,15 +794,6 @@ html[data-transition='close']::view-transition-new(root) {
   to {
     transform: translate(var(--vt-dx), var(--vt-dy)) scale(var(--vt-zoom));
     opacity: 0;
-  }
-}
-@keyframes vt-out-of-card {
-  from {
-    transform: translate(var(--vt-dx), var(--vt-dy)) scale(var(--vt-zoom));
-    opacity: 0; /* dissolves in over the detail page as that fades */
-  }
-  35% {
-    opacity: 1;
   }
 }
 

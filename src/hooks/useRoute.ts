@@ -34,8 +34,8 @@ const card = () => document.querySelector('.project-link[data-morph] .media')
 /**
  * Go to a route. Where the browser supports it, the view moves into the
  * clicked card until its picture fills the screen, then the detail page
- * fades up (and back out into the card on the way home; see "Page
- * transition" in styles.css); everywhere else it just switches.
+ * fades up; the way home is a plain dissolve (see "Page transition" in
+ * styles.css). Everywhere else it just switches.
  */
 export function navigate(href: string, id?: string) {
   const go = () => {
