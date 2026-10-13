@@ -19,23 +19,23 @@ const listeners = new Set<(r: Route) => void>()
 const clearMorph = () =>
   document.querySelectorAll('[data-morph]').forEach((el) => el.removeAttribute('data-morph'))
 
-// The camera's way through: the centre of the card's picture, and how far to
-// zoom for it to more than fill the screen. Read by "Page transition" in styles.css.
+// The camera's way into the card: how far to move its picture to the middle
+// of the screen, and how far to zoom it to more than fill the screen. Read by "Page transition" in styles.css.
 const aimAt = (card: Element | null) => {
   if (!card) return
   const r = card.getBoundingClientRect()
   const root = document.documentElement.style
-  root.setProperty('--vt-x', `${r.left + r.width / 2}px`)
-  root.setProperty('--vt-y', `${r.top + r.height / 2}px`)
+  root.setProperty('--vt-dx', `${innerWidth / 2 - (r.left + r.width / 2)}px`) // card centre → screen centre
+  root.setProperty('--vt-dy', `${innerHeight / 2 - (r.top + r.height / 2)}px`)
   root.setProperty('--vt-zoom', (Math.max(innerWidth / r.width, innerHeight / r.height) * 1.15).toFixed(2))
 }
 const card = () => document.querySelector('.project-link[data-morph] .media')
 
 /**
- * Go to a route. Where the browser supports it, the camera flies into the
- * clicked card and out the other side into its detail page (and back out of
- * it on the way home; see "Page transition" in styles.css); everywhere else
- * it just switches.
+ * Go to a route. Where the browser supports it, the view moves into the
+ * clicked card until its picture fills the screen, then the detail page
+ * fades up (and back out into the card on the way home; see "Page
+ * transition" in styles.css); everywhere else it just switches.
  */
 export function navigate(href: string, id?: string) {
   const go = () => {
