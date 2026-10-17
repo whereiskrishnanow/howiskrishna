@@ -93,7 +93,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('superagi', '05-unibox.webp')],
+        src: [img('superagi', '05-unibox-v2.webp')],
         alt: 'The Unibox app: one inbox of conversations from every channel, with contact details alongside',
         caption: {
           title: 'Unibox App',
@@ -102,7 +102,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('superagi', '06-cold-outreach.webp')],
+        src: [img('superagi', '06-cold-outreach-v2.webp')],
         alt: 'The Cold Outreach app: a multi-step outreach sequence with AI-personalised email and LinkedIn steps',
         caption: {
           title: 'Cold Outreach',
@@ -111,7 +111,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('superagi', '07-coder-pro.webp')],
+        src: [img('superagi', '07-coder-pro-v2.webp')],
         alt: 'Coder Pro inside the team chat app: a thread with the coding agent next to a code diff',
         caption: {
           title: 'Coder Pro Agent Ft. Team Chat App',
@@ -120,7 +120,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('superagi', '08-live-assist.webp')],
+        src: [img('superagi', '08-live-assist-v2.webp')],
         alt: 'I Live Assist during a video call: live insights, suggested next steps and AI responses beside the call',
         caption: {
           title: 'I Live Assist',
