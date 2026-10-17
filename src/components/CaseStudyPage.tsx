@@ -1,14 +1,39 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { inkForHex, measureInk, type Ink } from '../lib/tone'
 import { navigate } from '../hooks/useRoute'
 import { caseStudies, warmCaseStudy, type Block } from '../caseStudies'
 import type { Project } from '../content'
 import { BlurMedia } from './BlurMedia'
+import { ImagePreview, type Shot } from './ImagePreview'
 import { Scramble } from './Scramble'
 
 const COMING_SOON: Block[] = [{ type: 'p', text: 'The full case study is on its way. Meanwhile, happy to walk you through it on a call.' }]
 
-function Content({ block }: { block: Block }) {
+/** Every screenshot on the page, in order, with the caption it's shown with. */
+function shotsOf(blocks: Block[]) {
+  const shots: Shot[] = []
+  const first = blocks.map((block) => {
+    const at = shots.length
+    if (block.type === 'images') {
+      block.src.forEach((src) => shots.push({ src, alt: block.alt, ...block.caption }))
+    } else if (block.type === 'phones') {
+      block.items.forEach((item) => shots.push({ src: item.src, alt: `CooKit: ${item.label}`, title: item.label }))
+    }
+    return at
+  })
+  return { shots, first }
+}
+
+/** A screenshot in the article; clicking it opens the preview. */
+function Thumb({ shot, src, alt, onOpen }: { shot: number; src: string; alt: string; onOpen: (i: number) => void }) {
+  return (
+    <button type="button" className="cs-shot" data-shot={shot} aria-label={`Preview: ${alt}`} onClick={() => onOpen(shot)}>
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+    </button>
+  )
+}
+
+function Content({ block, first, onOpen }: { block: Block; first: number; onOpen: (i: number) => void }) {
   switch (block.type) {
     case 'p':
       return <p className="cs-p">{block.text}</p>
@@ -39,10 +64,10 @@ function Content({ block }: { block: Block }) {
     case 'phones':
       return (
         <div className="cs-phones">
-          {block.items.map((item) => (
+          {block.items.map((item, i) => (
             <figure key={item.src}>
               <figcaption>{item.label}</figcaption>
-              <img src={item.src} alt={`CooKit: ${item.label}`} loading="lazy" decoding="async" />
+              <Thumb shot={first + i} src={item.src} alt={`CooKit: ${item.label}`} onOpen={onOpen} />
             </figure>
           ))}
         </div>
@@ -51,13 +76,7 @@ function Content({ block }: { block: Block }) {
       return (
         <figure className="cs-figure">
           {block.src.map((src, i) => (
-            <img
-              key={src}
-              src={src}
-              alt={i === 0 ? block.alt : ''}
-              loading="lazy"
-              decoding="async"
-            />
+            <Thumb key={src} shot={first + i} src={src} alt={block.alt} onOpen={onOpen} />
           ))}
           {block.caption && (
             <figcaption>
@@ -79,6 +98,8 @@ function Content({ block }: { block: Block }) {
 export function CaseStudyPage({ project }: { project: Project }) {
   const study = caseStudies[project.id]
   const blocks = study?.blocks ?? COMING_SOON
+  const { shots, first } = useMemo(() => shotsOf(blocks), [blocks])
+  const [preview, setPreview] = useState<number | null>(null)
   const band = useRef<HTMLDivElement>(null)
   const scrollerTop = useRef<HTMLDivElement>(null)
 
@@ -152,11 +173,15 @@ export function CaseStudyPage({ project }: { project: Project }) {
         <article className="cs">
           <div className="cs-body">
             {blocks.map((block, i) => (
-              <Content key={i} block={block} />
+              <Content key={i} block={block} first={first[i]} onOpen={setPreview} />
             ))}
           </div>
         </article>
       </div>
+
+      {preview !== null && (
+        <ImagePreview shots={shots} index={preview} onIndex={setPreview} onClose={() => setPreview(null)} />
+      )}
     </div>
   )
 }

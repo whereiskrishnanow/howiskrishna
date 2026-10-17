@@ -662,6 +662,27 @@ a {
   background: rgb(0 0 0 / 0.04);
 }
 
+/* Screenshots open a preview (ImagePreview.tsx). */
+.cs-shot {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: calc(14 * var(--u));
+  background: none;
+  cursor: zoom-in;
+}
+.cs-shot img {
+  transition: transform 0.6s var(--ease-out);
+}
+.cs-shot:hover img {
+  transform: scale(1.008);
+}
+.cs-shot:focus-visible {
+  outline: 1.5px solid var(--ink-soft);
+  outline-offset: 4px;
+}
+
 .cs-figure figcaption {
   margin-top: calc(4 * var(--u));
   font-size: 0.94em;
@@ -809,6 +830,143 @@ html[data-transition='close']::view-transition-new(root) {
   .cs-body > :nth-child(3) { animation-delay: 0.44s; }
   .cs-body > :nth-child(4) { animation-delay: 0.51s; }
   .cs-body > :nth-child(n + 5) { animation-delay: 0.58s; } /* 5th and 6th */
+}
+
+/* ---------- Screenshot preview ---------- */
+
+/* The page frosts over in its own colour; the screenshot sits in the middle
+   at the largest size that fits, its caption below set like the article's. */
+.preview {
+  --max-w: min(92vw, 1320px);
+  --max-h: calc(100vh - 230px);
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 72px 4vw 48px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  -webkit-backdrop-filter: blur(28px) saturate(1.1);
+  backdrop-filter: blur(28px) saturate(1.1);
+  cursor: zoom-out;
+  outline: none;
+}
+
+.preview-figure {
+  display: grid;
+  gap: calc(18 * var(--u));
+  width: min(var(--max-w), calc(var(--max-h) * var(--ratio, 1.6)));
+}
+
+.preview-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: var(--ratio, 1.6);
+  border-radius: calc(16 * var(--u));
+  background: rgb(0 0 0 / 0.04);
+  box-shadow: 0 30px 80px -30px rgb(0 0 0 / 0.35);
+  user-select: none;
+}
+
+.preview-figure figcaption {
+  display: flex;
+  gap: calc(40 * var(--u));
+  justify-content: space-between;
+  align-items: baseline;
+  max-width: 100%;
+  color: var(--ink-soft);
+  font-size: calc(19 * var(--u));
+  line-height: 1.5;
+  animation: rise 0.6s var(--ease-out) 0.12s both;
+}
+.preview-figure figcaption strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+.preview-count {
+  flex: none;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+
+.preview-close,
+.preview-nav {
+  position: absolute;
+  padding: 12px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  opacity: 0.7;
+  cursor: pointer;
+  transition:
+    opacity 0.2s,
+    transform 0.4s var(--ease-out);
+}
+.preview-close:hover,
+.preview-nav:hover,
+.preview-close:focus-visible,
+.preview-nav:focus-visible {
+  opacity: 1;
+  outline: none;
+}
+.preview-close {
+  top: 22px;
+  right: 26px;
+}
+.preview-close svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+.preview-nav {
+  top: 50%;
+  translate: 0 -50%;
+}
+.preview-nav svg {
+  display: block;
+  width: 36px;
+  height: auto;
+}
+.preview-prev {
+  left: 22px;
+}
+.preview-next {
+  right: 22px;
+}
+.preview-prev:hover {
+  transform: translateX(-6px);
+}
+.preview-next:hover {
+  transform: translateX(6px);
+}
+.preview svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* the article holds still behind it */
+.previewing .cs-scroll {
+  overflow: hidden;
+}
+
+@media (max-width: 767.98px) {
+  .preview {
+    --max-w: 100%;
+    --max-h: calc(100vh - 200px);
+    padding: 64px 14px 32px;
+  }
+  .preview-figure figcaption {
+    flex-direction: column;
+    gap: 8px;
+    font-size: 14.5px;
+  }
+  .preview-nav {
+    display: none; /* swipe instead */
+  }
 }
 
 /* ---------- Contact ---------- */
