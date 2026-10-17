@@ -269,7 +269,7 @@ export const caseStudies: Record<string, CaseStudy> = {
   'coder-pro': {
     tagline: 'AI-Native Coding Assistant for Enterprise Teams',
     blocks: [
-      { type: 'images', src: [img('coder-pro', '01.webp')], alt: 'Coder Pro inside the team chat app' },
+      { type: 'images', src: [img('coder-pro', 'hero.webp')], alt: 'Coder Pro inside the team chat app' },
       {
         type: 'p',
         text: 'An AI-powered coding assistant designed for enterprise teams to collaborate with AI agents directly within their development workflows. It enables developers to delegate coding tasks, review generated code changes, and manage iterations through a unified chat and code review interface.',
@@ -293,31 +293,31 @@ export const caseStudies: Record<string, CaseStudy> = {
       { type: 'h2', text: 'So… this is how it goes' },
       {
         type: 'images',
-        src: [img('coder-pro', '02.webp')],
+        src: [img('coder-pro', 'task.webp')],
         alt: 'Giving the Coder Pro agent a task in a chat',
         caption: { text: 'The Coder Pro agent is always available in user chats, 24/7; where the user just have to give it a task for the agent to get started! It is a very simple experience similar to giving a task to your co-workers.' },
       },
       {
         type: 'images',
-        src: [img('coder-pro', '03.webp'), img('coder-pro', '04.webp')],
+        src: [img('coder-pro', 'local-folder.webp'), img('coder-pro', 'branch.webp')],
         alt: 'Choosing a local or cloud environment for the agent',
         caption: { text: 'The agent works on both local & cloud environments. User can decide what to use on their convenience and choose the following options accordingly' },
       },
       {
         type: 'images',
-        src: [img('coder-pro', '05.webp'), img('coder-pro', '06.webp')],
+        src: [img('coder-pro', 'code-file.webp'), img('coder-pro', 'code-detail.webp')],
         alt: 'The agent sending a code file in the chat, opened in detail',
         caption: { text: 'The agent now gets the task done and sends the code file in the chat itself, as a message. User will be able to view the code file in detail and make further changes if required.' },
       },
       {
         type: 'images',
-        src: [img('coder-pro', '07.webp'), img('coder-pro', '08.webp')],
+        src: [img('coder-pro', 'terminal.webp')],
         alt: 'Asking for further changes, with the terminal and repository files open',
         caption: { text: 'User can further chat with the coder pro agent to get further changes done, if required. User can also user Terminal within and can also view their current folder/repo files too.' },
       },
       {
         type: 'images',
-        src: [img('coder-pro', '09.webp')],
+        src: [img('coder-pro', 'commit.webp')],
         alt: 'Committing the changes to a branch',
         caption: { text: 'Finally when the user is convinced over the output, they can commit the changes to their desired branch and just BOOM; it’s done and dusted!' },
       },
