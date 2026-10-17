@@ -84,7 +84,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('superagi', '03-crm-contacts.webp'), img('superagi', '04-crm-profile.webp')],
+        src: [img('superagi', '03-crm-contacts.webp'), img('superagi', '04-crm-profile-v2.webp')],
         alt: 'The CRM app: a contacts table, and a contact’s profile page with activity, actions and agents',
         caption: {
           title: 'Data Display Ft. CRM App',
