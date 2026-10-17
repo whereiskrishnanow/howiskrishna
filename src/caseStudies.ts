@@ -111,7 +111,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('superagi', '07-coder-pro-v2.webp')],
+        src: [img('superagi', '07-coder-pro-v3.webp')],
         alt: 'Coder Pro inside the team chat app: a thread with the coding agent next to a code diff',
         caption: {
           title: 'Coder Pro Agent Ft. Team Chat App',
