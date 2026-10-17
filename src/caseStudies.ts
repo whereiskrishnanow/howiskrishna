@@ -120,7 +120,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('superagi', '08-live-assist-v2.webp')],
+        src: [img('superagi', '08-live-assist-v3.webp')],
         alt: 'I Live Assist during a video call: live insights, suggested next steps and AI responses beside the call',
         caption: {
           title: 'I Live Assist',
