@@ -317,7 +317,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       },
       {
         type: 'images',
-        src: [img('coder-pro', 'commit-v2.webp')],
+        src: [img('coder-pro', 'commit-v3.webp')],
         alt: 'Committing the changes to a branch',
         caption: { text: 'Finally when the user is convinced over the output, they can commit the changes to their desired branch and just BOOM; it’s done and dusted!' },
       },
