@@ -75,7 +75,7 @@ export const caseStudies: Record<string, CaseStudy> = {
       { type: 'h2', text: 'A slight peek into our Super App experience' },
       {
         type: 'images',
-        src: [img('superagi', '01-assistant-home.webp'), img('superagi', '02-assistant-answer.webp')],
+        src: [img('superagi', '01-assistant-home-v2.webp'), img('superagi', '02-assistant-answer-v2.webp')],
         alt: 'SuperAGI’s I Assistant: the chat home with suggested questions, and an answer listing key use cases',
         caption: {
           title: 'I Assistant',
