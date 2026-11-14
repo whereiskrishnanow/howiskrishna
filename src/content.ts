@@ -37,7 +37,7 @@ export const projects: Project[] = [
 ]
 
 export const contacts: { label: string; href: string; external: boolean; copy?: string }[] = [
-  { label: 'Resume', href: 'https://drive.google.com/file/d/1s-Xyzh_BEhCfGwhQzpS-BDruNb_Hr8st/view?usp=sharing', external: true },
+  { label: 'Resume', href: 'https://drive.google.com/file/d/1hMafE-vGPSoGfMqOWh2CglCpw3uhpKZI/view?usp=sharing', external: true },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/krishna-vamsi-anumalasetty/', external: true },
   // also copies the address, for visitors with no mail app set up
   {
