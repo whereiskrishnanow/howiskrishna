@@ -1404,18 +1404,35 @@ html[data-transition='close']::view-transition-new(root) {
     width: calc(100vw + var(--n) * var(--spin-step)); /* one full turn */
     padding-right: 0;
   }
+  /* The page's title and summary sit centred across the top; the cylinder
+     stands in the middle of the screen below them. */
   .row {
     position: fixed;
-    top: calc(50% + 24 * var(--u)); /* where the track's padding centred it */
+    inset: 0;
+    display: block;
+    pointer-events: none; /* only the title and the cards themselves catch the pointer */
+  }
+  .intro {
+    position: absolute;
+    top: calc(96 * var(--u));
     left: var(--gutter);
-    translate: 0 -50%;
+    right: var(--gutter);
+    text-align: center;
+    pointer-events: auto;
+  }
+  .intro-summary {
+    margin-inline: auto;
   }
 
   .projects-stage {
-    position: relative;
-    top: calc(-8 * var(--u)); /* labels sit a touch above the headline's baseline */
-    margin-left: calc(285 * var(--u));
+    position: absolute;
+    top: calc(50% + 60 * var(--u)); /* a little low: the cards' glow trails below them */
+    left: 50%;
+    translate: -50% -50%;
     perspective: calc(var(--card-w) * 3.2); /* PERSPECTIVE in useCylinder.ts */
+  }
+  .projects-stage .project {
+    pointer-events: auto;
   }
 
   .projects {
@@ -1465,6 +1482,27 @@ html[data-transition='close']::view-transition-new(root) {
   /* cards fade as they turn away from the front */
   .project-link {
     opacity: clamp(0, 0.2 + 0.8 * var(--face), 1);
+  }
+
+  /* Titles and summaries show on the card in front only, fading in as a card
+     comes round (useCylinder's --bend: 0 in front, 1 a card away). */
+  .project {
+    --text-shown: clamp(0, 1 - 2.5 * var(--bend, 0), 1);
+  }
+  html:not(.curved-cards) .project-head {
+    opacity: var(--text-shown); /* flat cards; the bent ones fade each letter */
+  }
+
+  /* titles and summaries centred over their card, like the page's own */
+  .project-head {
+    justify-content: center;
+  }
+  .project-text {
+    text-align: center;
+  }
+  .project-desc {
+    /* a left offset, not a transform: useCylinder reads each letter's place */
+    left: calc(50% - var(--w) / 2);
   }
 }
 
@@ -1522,8 +1560,9 @@ html[data-transition='close']::view-transition-new(root) {
     transform: translate3d(calc(var(--gx, 0px) * var(--bend, 1)), 0, calc(var(--gz, 0px) * var(--bend, 1)))
       rotateY(calc(var(--gphi, 0deg) * var(--bend, 1)));
     backface-visibility: hidden;
-    /* fades as its card turns away from the front (see .project-link above) */
-    opacity: calc(var(--enter) * var(--reveal) * clamp(0, 0.2 + 0.8 * var(--face), 1));
+    /* only the card in front shows its title and summary: they fade in as a
+       card arrives at the front (--bend falls to 0) and out as it leaves */
+    opacity: calc(var(--enter) * var(--reveal) * var(--text-shown));
   }
   .curved-cards .project-link:focus-visible .project-title .glyph {
     text-decoration: underline;
@@ -1564,9 +1603,6 @@ html[data-transition='close']::view-transition-new(root) {
 @media (min-width: 1500px) {
   .projects {
     margin-left: 0;
-  }
-  .projects-stage {
-    margin-left: calc(190 * var(--u));
   }
 }
 
