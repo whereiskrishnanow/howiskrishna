@@ -7,7 +7,11 @@ const DESKTOP = '(min-width: 768px)'
 
 // Where the row was scrolled to, so coming back from a detail page lands you
 // on the same card instead of at the start.
-let savedScroll = 0
+let savedScroll: number | null = null
+// The page puts the scroll back itself (below). Left to the browser, it would
+// also restore a position it remembered from some earlier visit, after ours,
+// and bring the wrong card round to the front.
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
 const REDUCED_MOTION = '(prefers-reduced-motion: reduce)'
 // How briskly the cylinder turns to the next card (per second): lower is
 // slower and softer. As set, a turn eases in and glides home in about 1.2s.
@@ -225,7 +229,9 @@ export function useHorizontalScroll() {
     window.addEventListener('hashchange', remember)
     window.addEventListener('portfolio:leave', remember)
 
-    if (savedScroll) {
+    // Restore it even when it's 0 (the first card): otherwise the browser puts
+    // back whatever position it last remembered for this page on its own.
+    if (savedScroll !== null) {
       window.scrollTo(savedScroll, 0)
       ;(lenis as Lenis | null)?.scrollTo(savedScroll, { immediate: true }) // set inside start()
     }

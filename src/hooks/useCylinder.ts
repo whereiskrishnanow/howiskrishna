@@ -62,7 +62,7 @@ export function cylinderShape(list: HTMLElement) {
   const n = list.children.length
   if (!media || !n) return null
   const cardH = media.offsetHeight
-  const cardW = cardH / 0.625 // 16:10
+  const cardW = media.offsetWidth
   return {
     cardW,
     cardH,

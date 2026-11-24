@@ -79,9 +79,12 @@ vec3 picture(vec2 q, float sigma) {
   c -= vec2(0.09 * cardW * cos(a), 0.05 * cardH * sin(a));
   float cs = cos(-drift.z), sn = sin(-drift.z);
   c = mat2(cs, sn, -sn, cs) * c / drift.y;
-  vec2 uv = c / vec2(cardW, cardH) + 0.5;
+  // the picture covers the card (object-fit: cover), cropped, never stretched
+  float aspect = texSize.x / texSize.y;
+  vec2 fit = aspect > cardW / cardH ? vec2(cardH * aspect, cardH) : vec2(cardW, cardW / aspect);
+  vec2 uv = c / fit + 0.5;
   // blur: a ring of taps on a pre-shrunk copy of the picture
-  float texel = texSize.x / (cardW * drift.y); // texels per px
+  float texel = texSize.x / (fit.x * drift.y); // texels per px
   float s = max(sigma * texel, 0.5);
   float lod = max(log2(s) - 0.6, 0.0);
   vec2 d = vec2(s) / texSize;

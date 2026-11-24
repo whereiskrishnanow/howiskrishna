@@ -1454,6 +1454,7 @@ html[data-transition='close']::view-transition-new(root) {
      the bent card itself, curvedCards.ts), so the title sits on its corner and
      the box catches hovers and clicks on it. Without WebGL it shows flat. */
   .project {
+    --h: calc(var(--w) * 0.8); /* taller cards on the cylinder (5:4) */
     /* 1 facing the front, 0 side-on, -1 facing away */
     --face: cos(calc(var(--i) * var(--step) - var(--spin, 0deg)));
     grid-area: 1 / 1;
