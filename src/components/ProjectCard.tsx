@@ -3,6 +3,7 @@ import type { Project } from '../content'
 import { BlurMedia } from './BlurMedia'
 import { Scramble } from './Scramble'
 import { navigate } from '../hooks/useRoute'
+import { CYLINDER } from '../hooks/useCylinder'
 import { warmCaseStudy } from '../caseStudies'
 
 type Props = {
@@ -40,6 +41,11 @@ export function ProjectCard({ project, index, active, onActivate, onDeactivate }
         onClick={(e) => {
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
           e.preventDefault()
+          // on the cylinder, a card off to the side first turns round to the front
+          if (window.matchMedia(CYLINDER).matches && !ref.current?.hasAttribute('data-front')) {
+            window.dispatchEvent(new CustomEvent('portfolio:spin-to', { detail: index }))
+            return
+          }
           e.currentTarget.dataset.morph = '' // this card's band is the one that morphs
           onDeactivate(project.id)
           navigate(project.href, project.id)
@@ -59,7 +65,19 @@ export function ProjectCard({ project, index, active, onActivate, onDeactivate }
         <span className="project-head">
           <span className="project-text">
             <span className="project-title-row">
-              <h2 className="project-title">{project.title}</h2>
+              <h2 className="project-title">
+                <span className="sr-only">{project.title}</span>
+                {/* one box per letter, so the cylinder can bend the title (useCylinder) */}
+                <span aria-hidden="true">
+                  {[...project.title].map((ch, i) =>
+                    ch === ' ' ? ' ' : (
+                      <span key={i} className="glyph">
+                        {ch}
+                      </span>
+                    ),
+                  )}
+                </span>
+              </h2>
             </span>
             <span className="project-desc">
               <Scramble text={project.description} active={active} delay={60} duration={500} />

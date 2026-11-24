@@ -1058,6 +1058,7 @@ html[data-transition='close']::view-transition-new(root) {
 @media (min-width: 768px) {
   html.is-home {
     overflow-y: hidden;
+    scrollbar-width: none; /* the cylinder never ends, so no scrollbar */
     overscroll-behavior-x: none; /* no back-swipe at the start of the row */
   }
 }
@@ -1388,5 +1389,200 @@ html[data-transition='close']::view-transition-new(root) {
   .project::after,
   .project::before {
     display: none;
+  }
+}
+
+/* ---------- Cylinder (desktop) ---------- */
+
+/* The cards stand around a cylinder, facing out, and scrolling sideways turns
+   it (useCylinder sets --spin). The page still scrolls underneath so the
+   easing, keys and "back to the same card" keep working: the track is just as
+   wide as the turning needs, while the row itself stays fixed on screen. */
+@media (min-width: 768px) {
+  .track {
+    --spin-step: calc(var(--card-w) + 120 * var(--u)); /* scroll per card */
+    width: calc(100vw + var(--n) * var(--spin-step)); /* one full turn */
+    padding-right: 0;
+  }
+  .row {
+    position: fixed;
+    top: calc(50% + 24 * var(--u)); /* where the track's padding centred it */
+    left: var(--gutter);
+    translate: 0 -50%;
+  }
+
+  .projects-stage {
+    position: relative;
+    top: calc(-8 * var(--u)); /* labels sit a touch above the headline's baseline */
+    margin-left: calc(285 * var(--u));
+    perspective: calc(var(--card-w) * 3.2); /* PERSPECTIVE in useCylinder.ts */
+  }
+
+  .projects {
+    /* Keep in step with FILL and PERSPECTIVE in useCylinder.ts. */
+    --step: calc(360deg / var(--n)); /* each card's share of the turn */
+    --arc: calc(var(--step) / 1.3); /* the part the card itself covers; the rest is gap */
+    --r: calc(var(--card-w) * 1.3 * var(--n) / 6.2831853); /* the cards' width, bent, fits the arc */
+    display: grid; /* every card in the same cell: the front one sets the size */
+    top: 0;
+    gap: 0;
+    margin: 0;
+    transform-style: preserve-3d;
+    /* the axis sits behind the front card, so that card is at its normal size */
+    translate: 0 0 calc(-1 * var(--r));
+    transform: rotateY(calc(-1 * var(--spin, 0deg)));
+  }
+
+  /* Each card's box spans the chord between its bent edges (the canvas draws
+     the bent card itself, curvedCards.ts), so the title sits on its corner and
+     the box catches hovers and clicks on it. Without WebGL it shows flat. */
+  .project {
+    /* 1 facing the front, 0 side-on, -1 facing away */
+    --face: cos(calc(var(--i) * var(--step) - var(--spin, 0deg)));
+    grid-area: 1 / 1;
+    width: calc(2 * var(--r) * sin(calc(var(--arc) / 2)));
+    transform: rotateY(calc(var(--i) * var(--step))) translateZ(calc(var(--r) * cos(calc(var(--arc) / 2))));
+    backface-visibility: hidden;
+  }
+
+  .curved-cards-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  /* the canvas draws the pictures; the HTML ones only come back to glide into a
+     detail page when a card is opened */
+  .curved-cards .projects .media-glow {
+    visibility: hidden;
+  }
+  .curved-cards .project-link[data-morph] .media-glow {
+    visibility: visible;
+  }
+
+  /* cards fade as they turn away from the front */
+  .project-link {
+    opacity: clamp(0, 0.2 + 0.8 * var(--face), 1);
+  }
+}
+
+/* ---------- Cylinder: bent text ---------- */
+
+/* While the cards are drawn bent (.curved-cards), their titles and
+   descriptions bend with them: every letter is moved onto the curve and turned
+   to follow it (useCylinder sets --gx, --gz, --gphi). For that each layer from
+   the card down to its letters has to stay 3D, and anything that would flatten
+   it (opacity, overflow) moves onto the letters themselves. */
+@property --enter {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --reveal {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
+@media (min-width: 768px) {
+  .curved-cards .project,
+  .curved-cards .project :is(
+      .project-link,
+      .project-head,
+      .project-text,
+      .project-title-row,
+      .project-title,
+      .project-title > span,
+      .project-desc,
+      .project-desc > span,
+      .project-desc > span > span
+    ) {
+    transform-style: preserve-3d;
+  }
+  .curved-cards .project-link {
+    opacity: 1; /* the letters fade instead */
+  }
+  .curved-cards .project-desc {
+    --reveal: 0; /* shown on hover, below */
+    overflow: visible;
+    opacity: 1;
+    transition:
+      --reveal 0.35s ease,
+      transform 0.6s var(--ease-out);
+  }
+  .curved-cards .project-link:focus-visible .project-desc {
+    --reveal: 1;
+  }
+
+  .curved-cards :is(.project-title .glyph, .project-desc .scramble-char) {
+    display: inline-block;
+    /* --bend (useCylinder): 0 flat for the card in front, 1 bent for the rest */
+    transform: translate3d(calc(var(--gx, 0px) * var(--bend, 1)), 0, calc(var(--gz, 0px) * var(--bend, 1)))
+      rotateY(calc(var(--gphi, 0deg) * var(--bend, 1)));
+    backface-visibility: hidden;
+    /* fades as its card turns away from the front (see .project-link above) */
+    opacity: calc(var(--enter) * var(--reveal) * clamp(0, 0.2 + 0.8 * var(--face), 1));
+  }
+  .curved-cards .project-link:focus-visible .project-title .glyph {
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.14em;
+  }
+  .curved-cards .project .media {
+    backface-visibility: hidden;
+  }
+
+  /* cards turned away can't be hovered or clicked */
+  .project[data-back] {
+    pointer-events: none;
+  }
+}
+@media (min-width: 768px) and (hover: hover) {
+  .curved-cards .project-link:hover .project-desc {
+    --reveal: 1;
+    transition-delay: 0.06s, 0s;
+  }
+}
+@media (min-width: 768px) and (hover: none) {
+  .curved-cards .project-desc {
+    --reveal: 1; /* no hover on touch: always shown */
+  }
+}
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .curved-cards .project {
+    animation-name: enter; /* the letters fade in, not the card (that would flatten it) */
+  }
+}
+@keyframes enter {
+  from {
+    --enter: 0;
+  }
+}
+
+@media (min-width: 1500px) {
+  .projects {
+    margin-left: 0;
+  }
+  .projects-stage {
+    margin-left: calc(190 * var(--u));
+  }
+}
+
+/* Coming in: the cylinder turns into place while the cards fade up. */
+@media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .projects {
+    animation: spin-in 1.6s var(--ease-out) both 0.15s;
+  }
+  .project {
+    animation: fade 1.2s ease both;
+    animation-delay: 0.2s;
+  }
+}
+
+@keyframes spin-in {
+  from {
+    rotate: y -45deg;
   }
 }
