@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { currentTheme, setTheme, warmTheme, type Theme } from '../lib/theme'
+import { currentTheme, setTheme, type Theme } from '../lib/theme'
 import { Scramble } from './Scramble'
 
 // The light/dark switch: a text link naming the mode it switches to, set like
@@ -20,9 +20,6 @@ export function ThemeSwitch() {
     <button
       type="button"
       className="theme-switch"
-      onPointerEnter={warmTheme}
-      onFocus={warmTheme}
-      // the label changes straight away; the page follows as the sheet comes off
       onClick={() => setTheme(next) && setLocal(next)}
     >
       <Scramble key={next} text={next === 'dark' ? 'Dark' : 'Light'} duration={500} />
