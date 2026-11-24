@@ -1,6 +1,5 @@
 import { useEffect, type RefObject } from 'react'
 import { isLite } from '../lib/device'
-import { CYLINDER } from './useCylinder'
 
 // The cards' blur tails lean gently the way the cursor is moving, then ease
 // back once it stops. Sets --tail-x / --tail-y (each -1..1) on the element;
@@ -18,7 +17,6 @@ export function useBlurTail(ref: RefObject<HTMLElement | null>) {
     const el = ref.current
     if (!el || isLite() || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
-    if (window.matchMedia(CYLINDER).matches) return // the cylinder's cards don't tilt
 
     const damping = 2 * DAMPING_RATIO * Math.sqrt(STIFFNESS)
     const speed = { x: 0, y: 0 } // smoothed cursor velocity, px/s

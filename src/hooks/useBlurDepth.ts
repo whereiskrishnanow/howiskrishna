@@ -1,6 +1,5 @@
 import { useEffect, type RefObject } from 'react'
 import { isLite } from '../lib/device'
-import { CYLINDER } from './useCylinder'
 
 // Gives each card's blur some depth. The card turns slightly toward the cursor
 // in 3D, and the blur layers sit at different depths behind the crisp top edge:
@@ -18,7 +17,6 @@ export function useBlurDepth(ref: RefObject<HTMLElement | null>) {
     const list = ref.current
     if (!list || isLite() || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
-    if (window.matchMedia(CYLINDER).matches) return // the cylinder's cards don't tilt
 
     const cards = [...list.querySelectorAll<HTMLElement>('.project')]
     const media = cards.map((c) => c.querySelector<HTMLElement>('.media'))

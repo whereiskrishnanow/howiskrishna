@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { contacts, intro, projects } from '../content'
 import { useActiveProject } from '../hooks/useActiveProject'
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll'
 import { useBlurTail } from '../hooks/useBlurTail'
 import { useBlurDepth } from '../hooks/useBlurDepth'
-import { useCylinder } from '../hooks/useCylinder'
 import { Backdrop } from './Backdrop'
-import { CurvedCards } from './CurvedCards'
 import { ProjectCard } from './ProjectCard'
 import { Scramble } from './Scramble'
 
@@ -16,7 +14,6 @@ export function HomePage() {
   const projectsRef = useRef<HTMLUListElement>(null)
   useBlurTail(projectsRef)
   useBlurDepth(projectsRef)
-  useCylinder(projectsRef)
 
   // "Mail" copies the address too (and still opens the mail app if there is
   // one), with a short note to say so.
@@ -37,9 +34,8 @@ export function HomePage() {
   return (
     <>
       <Backdrop projects={projects} activeId={activeId} ink={ink} />
-      <CurvedCards listRef={projectsRef} />
 
-      <main className="track" style={{ '--n': projects.length } as CSSProperties}>
+      <main className="track">
         <div className="row">
           <header className="intro">
             <h1 className="intro-title">{intro.title}</h1>
@@ -48,21 +44,18 @@ export function HomePage() {
             </p>
           </header>
 
-          {/* desktop: the cards stand around a cylinder that scrolling turns */}
-          <div className="projects-stage">
-            <ul ref={projectsRef} className="projects" aria-label="Selected work">
-              {projects.map((project, i) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={i}
-                  active={project.id === activeId}
-                  onActivate={activate}
-                  onDeactivate={deactivate}
-                />
-              ))}
-            </ul>
-          </div>
+          <ul ref={projectsRef} className="projects" aria-label="Selected work">
+            {projects.map((project, i) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                index={i}
+                active={project.id === activeId}
+                onActivate={activate}
+                onDeactivate={deactivate}
+              />
+            ))}
+          </ul>
         </div>
       </main>
 
