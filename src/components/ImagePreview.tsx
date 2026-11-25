@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { createPortal } from 'react-dom'
+import { shotSizes } from '../shotSizes'
 
 // A full-screen preview of a case study's screenshot. The picture grows out of
 // its place in the article into the middle of the screen, over the page
@@ -39,7 +40,8 @@ export function ImagePreview({ shots, index, onIndex, onClose }: Props) {
   // sized from the screenshot's shape up front, so the opening move can be
   // measured before the full image has painted
   const t = thumb(index)
-  const ratio = t instanceof HTMLImageElement && t.naturalWidth ? t.naturalWidth / t.naturalHeight : 1.6
+  const size = shotSizes[shot.src]
+  const ratio = size ? size[0] / size[1] : t instanceof HTMLImageElement && t.naturalWidth ? t.naturalWidth / t.naturalHeight : 1.6
 
   // the screenshot being previewed leaves its place in the article
   useLayoutEffect(() => {

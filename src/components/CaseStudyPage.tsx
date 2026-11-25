@@ -6,6 +6,7 @@ import type { Project } from '../content'
 import { BlurMedia } from './BlurMedia'
 import { ImagePreview, type Shot } from './ImagePreview'
 import { Scramble } from './Scramble'
+import { shotSizes } from '../shotSizes'
 
 const COMING_SOON: Block[] = [{ type: 'p', text: 'The full case study is on its way. Meanwhile, happy to walk you through it on a call.' }]
 
@@ -26,9 +27,22 @@ function shotsOf(blocks: Block[]) {
 
 /** A screenshot in the article; clicking it opens the preview. */
 function Thumb({ shot, src, alt, onOpen }: { shot: number; src: string; alt: string; onOpen: (i: number) => void }) {
+  const size = shotSizes[src]
   return (
     <button type="button" className="cs-shot" data-shot={shot} aria-label={`Preview: ${alt}`} onClick={() => onOpen(shot)}>
-      <img src={src} alt={alt} loading="lazy" decoding="async" />
+      {/* its space is kept before it loads, so the article never jumps; it
+          fades in once it's ready instead of popping in */}
+      <img
+        src={src}
+        alt={alt}
+        width={size?.[0]}
+        height={size?.[1]}
+        decoding="async"
+        onLoad={(e) => e.currentTarget.setAttribute('data-ready', '')}
+        ref={(el) => {
+          if (el?.complete && el.naturalWidth) el.setAttribute('data-ready', '') // already cached
+        }}
+      />
     </button>
   )
 }
@@ -102,6 +116,9 @@ export function CaseStudyPage({ project }: { project: Project }) {
   const [preview, setPreview] = useState<number | null>(null)
   const band = useRef<HTMLDivElement>(null)
   const scrollerTop = useRef<HTMLDivElement>(null)
+  // opened through the halo (lib/halo.ts): the halo is the entrance, so the
+  // page is all there as it's revealed instead of fading in underneath it
+  const [arrive] = useState(() => (document.documentElement.dataset.transition === 'halo' ? 'halo' : undefined))
 
   // The title sits on the band, so it takes white or black, whichever reads
   // better on this project's picture (same choice as the home page hover).
@@ -140,7 +157,7 @@ export function CaseStudyPage({ project }: { project: Project }) {
   }, [project.id])
 
   return (
-    <div className="cs-page">
+    <div className="cs-page" data-arrive={arrive}>
       <header className="cs-head" data-ink={ink} style={{ '--head-ink': ink === 'white' ? '#fff' : '#000' } as CSSProperties}>
         <div className="cs-band" ref={band}>
           <BlurMedia project={project} />

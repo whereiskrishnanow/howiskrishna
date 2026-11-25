@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { contacts, intro, projects } from '../content'
 import { useActiveProject } from '../hooks/useActiveProject'
 import { useHorizontalScroll } from '../hooks/useHorizontalScroll'
@@ -8,7 +8,18 @@ import { Backdrop } from './Backdrop'
 import { ProjectCard } from './ProjectCard'
 import { Scramble } from './Scramble'
 
+// The entrance (text decoding, cards sliding in) plays on the first visit
+// only; coming back from a case study, the page is simply there.
+let visited = false
+
 export function HomePage() {
+  const [firstVisit] = useState(() => !visited)
+  useLayoutEffect(() => {
+    visited = true
+    const root = document.documentElement
+    root.classList.toggle('home-again', !firstVisit) // styles.css, "Entrance"
+    return () => root.classList.remove('home-again')
+  }, [firstVisit])
   useHorizontalScroll()
   const { activeId, ink, activate, deactivate } = useActiveProject(projects)
   const projectsRef = useRef<HTMLUListElement>(null)
@@ -40,7 +51,7 @@ export function HomePage() {
           <header className="intro">
             <h1 className="intro-title">{intro.title}</h1>
             <p className="intro-summary">
-              <Scramble text={intro.summary} delay={200} duration={1200} />
+              <Scramble text={intro.summary} active={firstVisit} delay={200} duration={1200} />
             </p>
           </header>
 
@@ -69,7 +80,7 @@ export function HomePage() {
                 onClick={c.copy ? () => copy(c.copy!) : undefined}
               >
                 {/* decodes just after the intro text, one link after another */}
-                <Scramble text={c.label} delay={500 + i * 120} duration={600} />
+                <Scramble text={c.label} active={firstVisit} delay={500 + i * 120} duration={600} />
               </a>
             </li>
           ))}

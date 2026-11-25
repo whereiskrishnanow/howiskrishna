@@ -429,6 +429,28 @@ a {
   opacity: 1;
 }
 
+/* During a page transition the page is shown as still snapshots; the cursor
+   gets its own live layer on top so it keeps following the pointer instead of
+   freezing, still inverting what's under it. */
+.dot-cursor {
+  view-transition-name: dot-cursor;
+}
+::view-transition-group(dot-cursor) {
+  z-index: 10;
+  animation: none;
+  mix-blend-mode: difference;
+}
+::view-transition-image-pair(dot-cursor) {
+  isolation: auto;
+}
+::view-transition-old(dot-cursor) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(dot-cursor) {
+  animation: none;
+}
+
 /* ---------- Decoding text ---------- */
 
 /* While a character is still decoding, its real letter is kept (invisible) to
@@ -661,7 +683,13 @@ a {
   cursor: zoom-in;
 }
 .cs-shot img {
-  transition: transform 0.6s var(--ease-out);
+  opacity: 0;
+  transition:
+    transform 0.6s var(--ease-out),
+    opacity 0.4s ease;
+}
+.cs-shot img[data-ready] {
+  opacity: 1;
 }
 .cs-shot:hover img {
   transform: scale(1.008);
@@ -804,6 +832,12 @@ html[data-transition='close']::view-transition-new(root) {
     transform: translate(var(--vt-dx), var(--vt-dy)) scale(var(--vt-zoom));
     opacity: 0;
   }
+}
+
+/* opened through the halo, the page is already there as it's revealed */
+.cs-page[data-arrive='halo'] .cs,
+.cs-page[data-arrive='halo'] .cs-body > * {
+  animation: none !important;
 }
 
 /* the article rises in as the page arrives */
@@ -1141,18 +1175,20 @@ html[data-transition='close']::view-transition-new(root) {
 
 /* ---------- Entrance ---------- */
 
+/* first visit only: coming back from a case study (.home-again) the page is
+   simply there, not blanked and rebuilt */
 @media (prefers-reduced-motion: no-preference) {
-  .intro > * {
+  html:not(.home-again) .intro > * {
     animation: rise 1s var(--ease-out) both;
   }
-  .intro-summary {
+  html:not(.home-again) .intro-summary {
     animation-delay: 0.08s;
   }
-  .project {
+  html:not(.home-again) .project {
     animation: slide-in 1.3s var(--ease-out) both;
     animation-delay: calc(0.18s + var(--i) * 0.09s);
   }
-  .contact {
+  html:not(.home-again) .contact {
     animation: fade 1s ease both 0.4s;
   }
 }
