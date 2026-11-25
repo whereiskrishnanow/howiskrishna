@@ -26,17 +26,19 @@ function shotsOf(blocks: Block[]) {
 }
 
 /** A screenshot in the article; clicking it opens the preview. */
-function Thumb({ shot, src, alt, onOpen }: { shot: number; src: string; alt: string; onOpen: (i: number) => void }) {
+function Thumb({ shot, src, alt, load, onOpen }: { shot: number; src: string; alt: string; load: boolean; onOpen: (i: number) => void }) {
   const size = shotSizes[src]
   return (
     <button type="button" className="cs-shot" data-shot={shot} aria-label={`Preview: ${alt}`} onClick={() => onOpen(shot)}>
       {/* its space is kept before it loads, so the article never jumps; it
           fades in once it's ready instead of popping in */}
       <img
-        src={src}
+        src={load ? src : undefined}
         alt={alt}
         width={size?.[0]}
         height={size?.[1]}
+        style={size ? { aspectRatio: `${size[0]} / ${size[1]}` } : undefined}
+        loading="lazy"
         decoding="async"
         onLoad={(e) => e.currentTarget.setAttribute('data-ready', '')}
         ref={(el) => {
@@ -47,7 +49,7 @@ function Thumb({ shot, src, alt, onOpen }: { shot: number; src: string; alt: str
   )
 }
 
-function Content({ block, first, onOpen }: { block: Block; first: number; onOpen: (i: number) => void }) {
+function Content({ block, first, load, onOpen }: { block: Block; first: number; load: boolean; onOpen: (i: number) => void }) {
   switch (block.type) {
     case 'p':
       return <p className="cs-p">{block.text}</p>
@@ -81,7 +83,7 @@ function Content({ block, first, onOpen }: { block: Block; first: number; onOpen
           {block.items.map((item, i) => (
             <figure key={item.src}>
               <figcaption>{item.label}</figcaption>
-              <Thumb shot={first + i} src={item.src} alt={`CooKit: ${item.label}`} onOpen={onOpen} />
+              <Thumb shot={first + i} src={item.src} alt={`CooKit: ${item.label}`} load={load} onOpen={onOpen} />
             </figure>
           ))}
         </div>
@@ -90,7 +92,7 @@ function Content({ block, first, onOpen }: { block: Block; first: number; onOpen
       return (
         <figure className="cs-figure">
           {block.src.map((src, i) => (
-            <Thumb key={src} shot={first + i} src={src} alt={block.alt} onOpen={onOpen} />
+            <Thumb key={src} shot={first + i} src={src} alt={block.alt} load={load} onOpen={onOpen} />
           ))}
           {block.caption && (
             <figcaption>
@@ -119,6 +121,20 @@ export function CaseStudyPage({ project }: { project: Project }) {
   // opened through the halo (lib/halo.ts): the halo is the entrance, so the
   // page is all there as it's revealed instead of fading in underneath it
   const [arrive] = useState(() => (document.documentElement.dataset.transition === 'halo' ? 'halo' : undefined))
+  // The screenshots wait until the halo has finished opening the page:
+  // downloading and decoding them in the middle of it made it stutter. Their
+  // space is kept meanwhile, so nothing moves when they arrive.
+  const [loadShots, setLoadShots] = useState(arrive !== 'halo')
+  useEffect(() => {
+    if (loadShots) return
+    const go = () => setLoadShots(true)
+    window.addEventListener('portfolio:settled', go, { once: true })
+    const fallback = window.setTimeout(go, 2500)
+    return () => {
+      window.removeEventListener('portfolio:settled', go)
+      window.clearTimeout(fallback)
+    }
+  }, [loadShots])
 
   // The title sits on the band, so it takes white or black, whichever reads
   // better on this project's picture (same choice as the home page hover).
@@ -190,7 +206,7 @@ export function CaseStudyPage({ project }: { project: Project }) {
         <article className="cs">
           <div className="cs-body">
             {blocks.map((block, i) => (
-              <Content key={i} block={block} first={first[i]} onOpen={setPreview} />
+              <Content key={i} block={block} first={first[i]} load={loadShots} onOpen={setPreview} />
             ))}
           </div>
         </article>

@@ -149,6 +149,8 @@ export function haloTransition({ x, y, palette }: { x: number; y: number; palett
     cancelAnimationFrame(raf)
     canvas.remove()
     for (const p of ['--halo-ox', '--halo-oy', '--halo-feather']) root.style.removeProperty(p)
+    // the new page can start its heavier work now (CaseStudyPage's screenshots)
+    window.dispatchEvent(new Event('portfolio:settled'))
   })
   return transition
 }
