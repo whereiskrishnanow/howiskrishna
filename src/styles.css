@@ -1390,3 +1390,42 @@ html[data-transition='close']::view-transition-new(root) {
     display: none;
   }
 }
+
+/* ---------- Page transition: halo (lib/halo.ts) ---------- */
+
+/* Opening a card: the detail page shows through a circle opening from the
+   click, its edge feathered; the old page stays put underneath (halo.ts
+   animates the circle and the blurs, and draws the light). */
+@property --halo-r {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+html[data-transition='halo']::view-transition-old(root),
+html[data-transition='halo']::view-transition-new(root) {
+  animation: none;
+}
+html[data-transition='halo']::view-transition-new(root) {
+  mask-image: radial-gradient(
+    circle at var(--halo-ox) var(--halo-oy),
+    #000 calc(var(--halo-r) - var(--halo-feather)),
+    transparent var(--halo-r)
+  );
+}
+.halo {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  view-transition-name: halo;
+}
+::view-transition-group(halo) {
+  z-index: 3;
+  animation: none;
+}
+::view-transition-old(halo),
+::view-transition-new(halo) {
+  animation: none;
+}

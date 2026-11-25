@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { flushSync } from 'react-dom'
 import { isLite } from '../lib/device'
+import { haloTransition, type RGB } from '../lib/halo'
 
 // Hash-based routes (#/work/<id>), so the site works on any static host with no
 // server rewrites.
@@ -36,8 +37,10 @@ const card = () => document.querySelector('.project-link[data-morph] .media')
  * clicked card until its picture fills the screen, then the detail page
  * fades up; the way home is a plain dissolve (see "Page transition" in
  * styles.css). Everywhere else it just switches.
+ * `from`: where a card was clicked, and its colours; the detail page opens in
+ * a halo of them spreading from there instead (lib/halo.ts).
  */
-export function navigate(href: string, id?: string) {
+export function navigate(href: string, id?: string, { from }: { from?: { x: number; y: number; palette: RGB[] } } = {}) {
   const go = () => {
     window.dispatchEvent(new Event('portfolio:leave'))
     history.pushState(null, '', href)
@@ -56,8 +59,10 @@ export function navigate(href: string, id?: string) {
     return go()
   }
   aimAt(card())
-  document.documentElement.dataset.transition = parse().name === 'home' ? 'open' : 'close'
-  const t = document.startViewTransition(go)
+  const t = from
+    ? haloTransition(from, go)
+    : ((document.documentElement.dataset.transition = parse().name === 'home' ? 'open' : 'close'),
+      document.startViewTransition(go))
   t.finished.finally(() => {
     delete document.documentElement.dataset.transition
     clearMorph()

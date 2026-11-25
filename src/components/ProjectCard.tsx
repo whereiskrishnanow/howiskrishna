@@ -4,6 +4,7 @@ import { BlurMedia } from './BlurMedia'
 import { Scramble } from './Scramble'
 import { navigate } from '../hooks/useRoute'
 import { warmCaseStudy } from '../caseStudies'
+import { cardPalette } from '../lib/halo'
 
 type Props = {
   project: Project
@@ -40,9 +41,15 @@ export function ProjectCard({ project, index, active, onActivate, onDeactivate }
         onClick={(e) => {
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
           e.preventDefault()
-          e.currentTarget.dataset.morph = '' // this card's band is the one that morphs
           onDeactivate(project.id)
-          navigate(project.href, project.id)
+          // the page opens in a halo spreading from the click (from a key
+          // press, with no pointer position, from the middle of the card)
+          const box = e.currentTarget.querySelector('.media')!.getBoundingClientRect()
+          const at =
+            e.detail === 0 ? { x: box.left + box.width / 2, y: box.top + box.height / 2 } : { x: e.clientX, y: e.clientY }
+          // in the card's own colours
+          const palette = cardPalette(e.currentTarget.querySelector<HTMLImageElement>('.media-img'), project.tint)
+          navigate(project.href, project.id, { from: { ...at, palette } })
         }}
         // Mouse and pen only: on touch the tap just follows the link.
         onPointerEnter={(e) => {
